@@ -15,17 +15,17 @@ const AfsHero = () => {
         fill
         priority
         sizes="100vw"
-        className="object-cover object-[75%_center] sm:object-[68%_center] md:object-[62%_center] lg:object-center select-none"
+        className="object-cover object-[82%_center] sm:object-[76%_center] md:object-[70%_center] lg:object-[65%_center] select-none"
       />
 
-      <div className="absolute inset-0 bg-black/10 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/20 to-transparent pointer-events-none" />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 xl:px-16 w-full flex flex-col items-start text-left">
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6 }}
-          className="flex flex-col items-start gap-4 max-w-lg lg:max-w-xl"
+          className="flex flex-col items-start gap-3.5 max-w-xs sm:max-w-sm md:max-w-[420px]"
         >
           <div className="relative flex items-center justify-start py-1">
             <Image
@@ -38,7 +38,7 @@ const AfsHero = () => {
             />
           </div>
 
-          <p className="text-sm sm:text-base md:text-lg text-slate-100 leading-relaxed font-normal drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
+          <p className="text-sm sm:text-base text-slate-100 leading-relaxed font-normal drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] max-w-xs sm:max-w-sm md:max-w-[390px]">
             Engineered and crafted in Brittany, France by Foil And Co. Explore our complete catalogue of high-modulus carbon front wings, ultra-stiff masts, titanium fuselages, downwind boards, and wings.
           </p>
 
