@@ -25,6 +25,8 @@ const staticAfsSlugs = new Set([
   "uhm-carbon-mast",
   "uhm-skinny-carbon-mast",
   "infinity-foil-assist-mast",
+  "infinity-mast-manta-foils",
+  "infinity-mast-foil-drive",
   "stow-wing",
   "stream-wing",
 ]);
@@ -34,11 +36,7 @@ interface PageProps {
 }
 
 export const generateStaticParams = async () => {
-  return afsProducts
-    .filter((p) => !staticAfsSlugs.has(p.id))
-    .map((p) => ({
-      id: p.id,
-    }));
+  return [{ id: "_fallback" }];
 };
 
 export const generateMetadata = async ({
@@ -61,6 +59,9 @@ export const generateMetadata = async ({
 
 const AfsProductDetailPage = async ({ params }: PageProps) => {
   const { id } = await params;
+  if (id === "infinity-mast-manta-foils" || id === "infinity-mast-foil-drive") {
+    redirect("/afs-foils/infinity-foil-assist-mast");
+  }
   if (staticAfsSlugs.has(id)) {
     redirect(`/afs-foils/${id}`);
   }
