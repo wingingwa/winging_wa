@@ -2,8 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import "./manta-foils-2.css";
-import { mantaFoilsFirstTwoSectionsHtml } from "./mantaFoilsFirstTwoSectionsHtml";
-import MantaBrochureSections from "./MantaBrochureSections";
+import { mantaFoils2Html } from "./mantaFoils2Html";
 
 const MantaFoils2Content = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -40,15 +39,12 @@ const MantaFoils2Content = () => {
   }, []);
 
   return (
-    <div className="w-full bg-[#4A505B] text-white overflow-hidden">
-      <div
-        ref={containerRef}
-        suppressHydrationWarning
-        className="manta-foils-2-wrapper w-full bg-[#4A505B] text-white overflow-hidden"
-        dangerouslySetInnerHTML={{ __html: mantaFoilsFirstTwoSectionsHtml }}
-      />
-      <MantaBrochureSections />
-    </div>
+    <div
+      ref={containerRef}
+      suppressHydrationWarning
+      className="manta-foils-2-wrapper w-full bg-[#4A505B] text-white overflow-hidden"
+      dangerouslySetInnerHTML={{ __html: mantaFoils2Html }}
+    />
   );
 };
 
