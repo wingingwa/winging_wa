@@ -172,3 +172,16 @@
     display: none;
   }
 }
+
+[class*="-page"] {
+  background-color: #4A505B;
+  color: #ffffff;
+}
+
+[class*="-page"] .main {
+  background-color: #4A505B;
+}
+
+[class*="-page"] .lp-root {
+  background-color: #4A505B;
+}

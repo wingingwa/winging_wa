@@ -11,8 +11,8 @@ export const metadata: Metadata = {
 
 export default function SilkV2FrontWingPage() {
   return (
-    <div className="min-h-screen flex flex-col bg-[#000] text-white overflow-x-clip">
-      <Suspense fallback={<div className="h-20 bg-[#000]" />}>
+    <div className="min-h-screen flex flex-col bg-[#4A505B] text-white overflow-x-clip">
+      <Suspense fallback={<div className="h-20 bg-[#4A505B]" />}>
         <Navbar />
       </Suspense>
       <main className="flex-1 pt-20 md:pt-24">

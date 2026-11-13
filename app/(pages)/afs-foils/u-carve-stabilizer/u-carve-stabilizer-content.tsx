@@ -74,7 +74,7 @@ const toggle = root.querySelector("#infinity-mast-toggle");
   return (
     <div
       ref={containerRef}
-      className="u-carve-stabilizer-page __variable_d35d24 __className_d35d24 __variable_0d9bde __className_0d9bde antialiased relative w-full bg-[#000] text-white overflow-hidden"
+      className="u-carve-stabilizer-page __variable_d35d24 __className_d35d24 __variable_0d9bde __className_0d9bde antialiased relative w-full bg-[#4A505B] text-white overflow-hidden"
       dangerouslySetInnerHTML={{ __html: pageHtml }}
     />
   );
