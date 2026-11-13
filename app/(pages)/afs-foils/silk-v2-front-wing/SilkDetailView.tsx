@@ -46,31 +46,7 @@ export default function SilkDetailView() {
         activateTab(2);
       }
     }
-
-    const bandeau = root.querySelector("#bandeau-fiche");
-    if (bandeau) {
-      const navButtons = bandeau.querySelectorAll<HTMLButtonElement>("nav button");
-      if (navButtons.length >= 2) {
-        const overviewBtn = navButtons[0];
-        const specsBtn = navButtons[1];
-
-        overviewBtn.onclick = () => {
-          root.querySelector("#apercu")?.scrollIntoView({ behavior: "smooth" });
-        };
-
-        specsBtn.onclick = () => {
-          root.querySelector("#modeles")?.scrollIntoView({ behavior: "smooth" });
-        };
-      }
-
-      const sizeGuideBtn = bandeau.querySelector<HTMLButtonElement>('button:has(span[aria-hidden="true"])');
-      if (sizeGuideBtn) {
-        sizeGuideBtn.onclick = () => {
-          root.querySelector("#range")?.scrollIntoView({ behavior: "smooth" });
-        };
-      }
-    }
-  }, []);
+}, []);
 
   return (
     <div

@@ -46,21 +46,7 @@ export default function ProductContentView() {
         activateTab(0);
       }
     }
-
-    const bandeau = root.querySelector("#bandeau-fiche");
-    if (bandeau) {
-      const navButtons = bandeau.querySelectorAll<HTMLButtonElement>("nav button");
-      if (navButtons.length >= 2) {
-        navButtons[0].onclick = () => {
-          root.querySelector("#apercu")?.scrollIntoView({ behavior: "smooth" });
-        };
-        navButtons[1].onclick = () => {
-          root.querySelector("#modeles")?.scrollIntoView({ behavior: "smooth" });
-        };
-      }
-    }
-
-    const toggle = root.querySelector("#infinity-mast-toggle");
+const toggle = root.querySelector("#infinity-mast-toggle");
     if (toggle) {
       const btnManta = root.querySelector<HTMLButtonElement>("#btn-tab-manta");
       const btnFoilDrive = root.querySelector<HTMLButtonElement>("#btn-tab-foildrive");
