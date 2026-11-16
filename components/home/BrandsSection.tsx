@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 const BrandsSection = () => {
   return (
@@ -76,22 +75,19 @@ const BrandsSection = () => {
             </div>
 
             <div className="flex flex-wrap items-center gap-3 pt-1">
-              <Button
-                nativeButton={false}
-                render={<Link href="/afs-foils" />}
-                className="h-10 rounded-full px-5 bg-[#ef0e0a] hover:bg-[#c40c08] text-white text-sm font-semibold cursor-pointer shadow-md shadow-orange-950/30 inline-flex items-center gap-1.5 flex-1 sm:flex-initial"
+              <Link
+                href="/afs-foils"
+                className="h-10 rounded-full px-5 bg-[#ef0e0a] hover:bg-[#c40c08] text-white text-sm font-semibold cursor-pointer shadow-md shadow-orange-950/30 inline-flex items-center justify-center gap-1.5 flex-1 sm:flex-initial transition-colors"
               >
                 <span>Explore AFS</span>
                 <ArrowUpRight className="size-4" />
-              </Button>
-              <Button
-                nativeButton={false}
-                variant="outline"
-                render={<Link href="/contact" />}
-                className="h-10 rounded-full px-5 border-white/20 bg-white/5 hover:bg-white/10 text-white text-sm font-semibold cursor-pointer inline-flex items-center gap-1.5 flex-1 sm:flex-initial"
+              </Link>
+              <Link
+                href="/contact"
+                className="h-10 rounded-full px-5 border border-white/20 bg-white/5 hover:bg-white/10 text-white text-sm font-semibold cursor-pointer inline-flex items-center justify-center gap-1.5 flex-1 sm:flex-initial transition-colors"
               >
                 <span>Enquire Pricing</span>
-              </Button>
+              </Link>
             </div>
           </div>
 
@@ -146,22 +142,19 @@ const BrandsSection = () => {
             </div>
 
             <div className="flex flex-wrap items-center gap-3 pt-1">
-              <Button
-                nativeButton={false}
-                render={<Link href="/manta-foils" />}
-                className="h-10 rounded-full px-5 bg-[#ef0e0a] hover:bg-[#c40c08] text-white text-sm font-semibold cursor-pointer shadow-md shadow-orange-950/30 inline-flex items-center gap-1.5 flex-1 sm:flex-initial"
+              <Link
+                href="/manta-foils"
+                className="h-10 rounded-full px-5 bg-[#ef0e0a] hover:bg-[#c40c08] text-white text-sm font-semibold cursor-pointer shadow-md shadow-orange-950/30 inline-flex items-center justify-center gap-1.5 flex-1 sm:flex-initial transition-colors"
               >
                 <span>Shop Manta</span>
                 <ArrowUpRight className="size-4" />
-              </Button>
-              <Button
-                nativeButton={false}
-                variant="outline"
-                render={<Link href="/contact" />}
-                className="h-10 rounded-full px-5 border-white/20 bg-white/5 hover:bg-white/10 text-white text-sm font-semibold cursor-pointer inline-flex items-center gap-1.5 flex-1 sm:flex-initial"
+              </Link>
+              <Link
+                href="/contact"
+                className="h-10 rounded-full px-5 border border-white/20 bg-white/5 hover:bg-white/10 text-white text-sm font-semibold cursor-pointer inline-flex items-center justify-center gap-1.5 flex-1 sm:flex-initial transition-colors"
               >
                 <span>Enquire Systems</span>
-              </Button>
+              </Link>
             </div>
           </div>
         </div>
