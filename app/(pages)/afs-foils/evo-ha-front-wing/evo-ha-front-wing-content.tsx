@@ -46,7 +46,8 @@ export default function ProductContentView() {
         activateTab(0);
       }
     }
-const toggle = root.querySelector("#infinity-mast-toggle");
+
+    const toggle = root.querySelector("#infinity-mast-toggle");
     if (toggle) {
       const btnManta = root.querySelector<HTMLButtonElement>("#btn-tab-manta");
       const btnFoilDrive = root.querySelector<HTMLButtonElement>("#btn-tab-foildrive");
@@ -68,6 +69,84 @@ const toggle = root.querySelector("#infinity-mast-toggle");
           panelManta.classList.add("hidden");
         };
       }
+    }
+
+    let selectedSurface = "HA750";
+    const priceDisplay = root.querySelector<HTMLDivElement>("#achat-price-display");
+    const submitBtn = root.querySelector<HTMLButtonElement>("#btn-submit-order");
+    const label750 = root.querySelector<HTMLLabelElement>("#label-surface-ha750");
+    const label1000 = root.querySelector<HTMLLabelElement>("#label-surface-ha1000");
+    const radio750 = root.querySelector<HTMLInputElement>('input[value="HA750"]');
+    const radio1000 = root.querySelector<HTMLInputElement>('input[value="HA1000"]');
+    const achatSec = root.querySelector("#achat");
+
+    const updateSurfaceSelection = (surface: string) => {
+      selectedSurface = surface;
+      if (surface === "HA1000") {
+        if (radio1000) radio1000.checked = true;
+        if (radio750) radio750.checked = false;
+        if (priceDisplay) priceDisplay.textContent = "829,00 €";
+        if (submitBtn) submitBtn.textContent = "Buy Now / Enquire & Order (HA1000)";
+        if (label1000) {
+          label1000.className = "surface-option flex w-full items-center cursor-pointer rounded-[4px] transition-all gap-4 border-2 border-[#111] bg-[#f8f9fa] px-5 py-4 shadow-sm";
+        }
+        if (label750) {
+          label750.className = "surface-option flex w-full items-center cursor-pointer rounded-[4px] transition-all gap-4 border border-[#eee] bg-white px-5 py-4 hover:border-[#ccc]";
+        }
+      } else {
+        if (radio750) radio750.checked = true;
+        if (radio1000) radio1000.checked = false;
+        if (priceDisplay) priceDisplay.textContent = "739,00 €";
+        if (submitBtn) submitBtn.textContent = "Buy Now / Enquire & Order (HA750)";
+        if (label750) {
+          label750.className = "surface-option flex w-full items-center cursor-pointer rounded-[4px] transition-all gap-4 border-2 border-[#111] bg-[#f8f9fa] px-5 py-4 shadow-sm";
+        }
+        if (label1000) {
+          label1000.className = "surface-option flex w-full items-center cursor-pointer rounded-[4px] transition-all gap-4 border border-[#eee] bg-white px-5 py-4 hover:border-[#ccc]";
+        }
+      }
+    };
+
+    if (label750) {
+      label750.onclick = (e) => {
+        e.preventDefault();
+        updateSurfaceSelection("HA750");
+      };
+    }
+
+    if (label1000) {
+      label1000.onclick = (e) => {
+        e.preventDefault();
+        updateSurfaceSelection("HA1000");
+      };
+    }
+
+    const buyButtons = root.querySelectorAll<HTMLButtonElement>(".btn-model-buy-now, #btn-cta-buy-now");
+    buyButtons.forEach((btn) => {
+      btn.onclick = () => {
+        const surface = btn.getAttribute("data-buy-surface");
+        if (surface) {
+          updateSurfaceSelection(surface);
+        }
+        if (achatSec) {
+          achatSec.scrollIntoView({ behavior: "smooth" });
+        }
+      };
+    });
+
+    if (submitBtn) {
+      submitBtn.onclick = (e) => {
+        e.preventDefault();
+        window.location.href = `/contact?item=${encodeURIComponent(`AFS Evo HA Front Wing (${selectedSurface})`)}`;
+      };
+    }
+
+    const achatForm = root.querySelector<HTMLFormElement>("#achat form");
+    if (achatForm) {
+      achatForm.onsubmit = (e) => {
+        e.preventDefault();
+        window.location.href = `/contact?item=${encodeURIComponent(`AFS Evo HA Front Wing (${selectedSurface})`)}`;
+      };
     }
   }, []);
 

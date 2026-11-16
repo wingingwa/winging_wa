@@ -60,3 +60,123 @@
 .enduro-front-wing-page article[id^="enduro-"] .pointer-events-none {
   opacity: 1 !important;
 }
+
+.enduro-front-wing-page .enduro-scale-section {
+  width: 100% !important;
+  max-width: 1920px !important;
+  margin-inline: auto !important;
+  padding-inline: clamp(1.25rem, 10.4167vw - 5.4167rem, 5rem) !important;
+  padding-block: 40px 80px !important;
+}
+
+@media (min-width: 768px) {
+  .enduro-front-wing-page .enduro-scale-section {
+    padding-block: clamp(80px, 9vw, 100px) !important;
+  }
+}
+
+.enduro-front-wing-page .enduro-scale-grid {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  align-items: center !important;
+  gap: clamp(32px, 5vw, 80px) !important;
+  max-width: 1320px !important;
+  margin-inline: auto !important;
+  width: 100% !important;
+}
+
+@media (min-width: 900px) {
+  .enduro-front-wing-page .enduro-scale-grid {
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr) !important;
+    gap: clamp(40px, 5vw, 80px) !important;
+  }
+}
+
+.enduro-front-wing-page .enduro-scale-wings {
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: clamp(6px, 1vw, 14px) !important;
+  padding-block: clamp(20px, 3vw, 40px) !important;
+  width: 100% !important;
+}
+
+.enduro-front-wing-page .enduro-wing-item {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.enduro-front-wing-page .enduro-wing-1300 { width: 82% !important; }
+.enduro-front-wing-page .enduro-wing-1100 { width: 75.8% !important; }
+.enduro-front-wing-page .enduro-wing-1000 { width: 72.4% !important; }
+.enduro-front-wing-page .enduro-wing-900  { width: 68.5% !important; }
+.enduro-front-wing-page .enduro-wing-800  { width: 64.8% !important; }
+.enduro-front-wing-page .enduro-wing-700  { width: 60.4% !important; }
+.enduro-front-wing-page .enduro-wing-600  { width: 56% !important; }
+
+.enduro-front-wing-page .enduro-wing-item img {
+  position: relative !important;
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  filter: drop-shadow(rgba(255, 255, 255, 0.35) 0px 0px 1px) !important;
+}
+
+.enduro-front-wing-page .enduro-wing-size {
+  position: absolute !important;
+  left: 100% !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  margin-left: 14px !important;
+  white-space: nowrap !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.12em !important;
+  color: #8E8E8E !important;
+  line-height: 1 !important;
+}
+
+.enduro-front-wing-page .enduro-scale-content {
+  max-width: 500px !important;
+  width: 100% !important;
+}
+
+.enduro-front-wing-page .enduro-scale-badge {
+  margin-bottom: 18px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.2em !important;
+  color: #DE4750 !important;
+}
+
+.enduro-front-wing-page .enduro-scale-title {
+  margin: 0 !important;
+  font-size: clamp(26px, 3vw, 46px) !important;
+  font-weight: 700 !important;
+  line-height: 1.05 !important;
+  letter-spacing: -0.02em !important;
+}
+
+.enduro-front-wing-page .enduro-scale-body {
+  margin-top: 22px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+  font-size: 15px !important;
+  line-height: 1.55 !important;
+  color: #A8A8A8 !important;
+}
+
+.enduro-front-wing-page .enduro-scale-footnote {
+  margin-bottom: 0 !important;
+  margin-top: 26px !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.2em !important;
+  color: #6F6F6F !important;
+}
