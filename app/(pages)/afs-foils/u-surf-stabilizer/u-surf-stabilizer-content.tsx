@@ -46,7 +46,8 @@ export default function ProductContentView() {
         activateTab(0);
       }
     }
-const toggle = root.querySelector("#infinity-mast-toggle");
+
+    const toggle = root.querySelector("#infinity-mast-toggle");
     if (toggle) {
       const btnManta = root.querySelector<HTMLButtonElement>("#btn-tab-manta");
       const btnFoilDrive = root.querySelector<HTMLButtonElement>("#btn-tab-foildrive");
@@ -70,79 +71,214 @@ const toggle = root.querySelector("#infinity-mast-toggle");
       }
     }
 
-    const swiperSlides = root.querySelectorAll<HTMLElement>(".swiper-slide");
-    const thumbBtns = root.querySelectorAll<HTMLButtonElement>("button img[alt^='thumb-']");
-    if (swiperSlides.length > 0 && thumbBtns.length > 0) {
-      const parentThumbBtns = Array.from(thumbBtns).map((img) => img.closest("button")!);
-      const activateSlide = (slideIdx: number) => {
-        swiperSlides.forEach((slide, idx) => {
-          if (idx === slideIdx) {
-            slide.style.display = "flex";
-            slide.style.opacity = "1";
-          } else {
-            slide.style.display = "none";
-            slide.style.opacity = "0";
-          }
-        });
-        parentThumbBtns.forEach((btn, idx) => {
-          if (btn) {
-            if (idx === slideIdx) {
-              btn.classList.add("border-b-2", "border-[#D44841]");
-            } else {
-              btn.classList.remove("border-b-2", "border-[#D44841]");
-            }
-          }
-        });
-      };
+    const modelsData = [
+      {
+        name: "U-Surf 120",
+        size: "120",
+        surface: "120 cm2",
+        span: "328 mm",
+        ar: "9",
+        chord: "50 mm",
+        thick: "5 mm",
+        images: [
+          "/afs-foils/u-surf-stabilizer/USURF_120_0001-1.png",
+          "/afs-foils/u-surf-stabilizer/USURF_120_0002-1.png",
+          "/afs-foils/u-surf-stabilizer/USURF_120_0003-1.png",
+          "/afs-foils/u-surf-stabilizer/USURF_120_0004-1.png"
+        ]
+      },
+      {
+        name: "U-Surf 135",
+        size: "135",
+        surface: "135 cm2",
+        span: "348 mm",
+        ar: "9",
+        chord: "53 mm",
+        thick: "5 mm",
+        images: [
+          "/afs-foils/u-surf-stabilizer/USURF_135_0001-1-1.png",
+          "/afs-foils/u-surf-stabilizer/USURF_135_0002-1.png",
+          "/afs-foils/u-surf-stabilizer/USURF_135_0003-1.png",
+          "/afs-foils/u-surf-stabilizer/USURF_135_0004-1.png"
+        ]
+      },
+      {
+        name: "U-Surf 150",
+        size: "150",
+        surface: "150 cm2",
+        span: "368 mm",
+        ar: "9",
+        chord: "56 mm",
+        thick: "5 mm",
+        images: [
+          "/afs-foils/u-surf-stabilizer/USURF_150_0001-1.png",
+          "/afs-foils/u-surf-stabilizer/USURF_150_0002-1.png",
+          "/afs-foils/u-surf-stabilizer/USURF_150_0003-1.png",
+          "/afs-foils/u-surf-stabilizer/USURF_150_0004-1.png"
+        ]
+      }
+    ];
 
-      parentThumbBtns.forEach((btn, idx) => {
-        if (btn) {
-          btn.onclick = () => activateSlide(idx);
+    let currentModelIdx = 0;
+    const techModelTitle = root.querySelector<HTMLHeadingElement>("#tech-model-title");
+    const specSurface = root.querySelector<HTMLTableCellElement>(".spec-surface");
+    const specSpan = root.querySelector<HTMLTableCellElement>(".spec-span");
+    const specAr = root.querySelector<HTMLTableCellElement>(".spec-ar");
+    const specChord = root.querySelector<HTMLTableCellElement>(".spec-chord");
+    const specThick = root.querySelector<HTMLTableCellElement>(".spec-thick");
+    const slideImgs = root.querySelectorAll<HTMLImageElement>(".tech-main-slide");
+    const thumbBtns = root.querySelectorAll<HTMLButtonElement>(".tech-thumb-btn");
+    const sizePills = root.querySelectorAll<HTMLButtonElement>(".tech-size-pill");
+
+    const updateSlideView = (slideIdx: number) => {
+      slideImgs.forEach((img, idx) => {
+        if (idx === slideIdx) {
+          img.classList.remove("opacity-0", "pointer-events-none");
+          img.classList.add("opacity-100");
+        } else {
+          img.classList.remove("opacity-100");
+          img.classList.add("opacity-0", "pointer-events-none");
         }
       });
-      activateSlide(0);
+
+      thumbBtns.forEach((btn, idx) => {
+        const glow = btn.querySelector(".thumb-glow");
+        if (idx === slideIdx) {
+          btn.classList.add("border-b-2", "border-[#D44841]");
+          if (glow) glow.classList.remove("hidden");
+        } else {
+          btn.classList.remove("border-b-2", "border-[#D44841]");
+          if (glow) glow.classList.add("hidden");
+        }
+      });
+    };
+
+    const selectModel = (modelIdx: number) => {
+      currentModelIdx = modelIdx;
+      const data = modelsData[modelIdx];
+      if (!data) return;
+
+      if (techModelTitle) techModelTitle.textContent = data.name;
+      if (specSurface) specSurface.textContent = data.surface;
+      if (specSpan) specSpan.textContent = data.span;
+      if (specAr) specAr.textContent = data.ar;
+      if (specChord) specChord.textContent = data.chord;
+      if (specThick) specThick.textContent = data.thick;
+
+      slideImgs.forEach((img, idx) => {
+        if (data.images[idx]) {
+          img.src = data.images[idx];
+        }
+      });
+
+      thumbBtns.forEach((btn, idx) => {
+        const thumbImg = btn.querySelector("img");
+        if (thumbImg && data.images[idx]) {
+          thumbImg.src = data.images[idx];
+        }
+      });
+
+      sizePills.forEach((pill, idx) => {
+        if (idx === modelIdx) {
+          pill.className = "tech-size-pill cursor-pointer relative z-10 px-[16px] py-2 rounded-full whitespace-nowrap text-sm font-semibold uppercase transition-all bg-white text-[#111111] shadow-sm";
+        } else {
+          pill.className = "tech-size-pill cursor-pointer relative z-10 px-[16px] py-2 rounded-full whitespace-nowrap text-sm font-semibold uppercase transition-all text-white hover:text-white/80";
+        }
+      });
+
+      updateSlideView(0);
+    };
+
+    thumbBtns.forEach((btn, idx) => {
+      btn.onclick = () => updateSlideView(idx);
+    });
+
+    sizePills.forEach((pill, idx) => {
+      pill.onclick = () => selectModel(idx);
+    });
+
+    let selectedSize = "120";
+    const submitBtn = root.querySelector<HTMLButtonElement>("#btn-submit-order");
+    const label120 = root.querySelector<HTMLLabelElement>("#label-size-120");
+    const label135 = root.querySelector<HTMLLabelElement>("#label-size-135");
+    const label150 = root.querySelector<HTMLLabelElement>("#label-size-150");
+    const radio120 = root.querySelector<HTMLInputElement>('input[value="120"]');
+    const radio135 = root.querySelector<HTMLInputElement>('input[value="135"]');
+    const radio150 = root.querySelector<HTMLInputElement>('input[value="150"]');
+    const achatSec = root.querySelector("#achat");
+
+    const updateSizeSelection = (size: string) => {
+      selectedSize = size;
+      if (radio120) radio120.checked = size === "120";
+      if (radio135) radio135.checked = size === "135";
+      if (radio150) radio150.checked = size === "150";
+
+      if (submitBtn) {
+        submitBtn.textContent = `Buy Now / Enquire & Order (U-Surf ${size})`;
+      }
+
+      if (label120) {
+        label120.className = size === "120"
+          ? "size-option flex w-full items-center cursor-pointer rounded-[4px] transition-all gap-4 border-2 border-[#111] bg-[#f8f9fa] px-5 py-4 shadow-sm"
+          : "size-option flex w-full items-center cursor-pointer rounded-[4px] transition-all gap-4 border border-[#eee] bg-white px-5 py-4 hover:border-[#ccc]";
+      }
+      if (label135) {
+        label135.className = size === "135"
+          ? "size-option flex w-full items-center cursor-pointer rounded-[4px] transition-all gap-4 border-2 border-[#111] bg-[#f8f9fa] px-5 py-4 shadow-sm"
+          : "size-option flex w-full items-center cursor-pointer rounded-[4px] transition-all gap-4 border border-[#eee] bg-white px-5 py-4 hover:border-[#ccc]";
+      }
+      if (label150) {
+        label150.className = size === "150"
+          ? "size-option flex w-full items-center cursor-pointer rounded-[4px] transition-all gap-4 border-2 border-[#111] bg-[#f8f9fa] px-5 py-4 shadow-sm"
+          : "size-option flex w-full items-center cursor-pointer rounded-[4px] transition-all gap-4 border border-[#eee] bg-white px-5 py-4 hover:border-[#ccc]";
+      }
+    };
+
+    if (label120) {
+      label120.onclick = (e) => {
+        e.preventDefault();
+        updateSizeSelection("120");
+      };
+    }
+    if (label135) {
+      label135.onclick = (e) => {
+        e.preventDefault();
+        updateSizeSelection("135");
+      };
+    }
+    if (label150) {
+      label150.onclick = (e) => {
+        e.preventDefault();
+        updateSizeSelection("150");
+      };
     }
 
-    const pillBtns = root.querySelectorAll<HTMLButtonElement>(".rounded-full.bg-\\[\\#1F1F1F\\] button");
-    const techTitle = root.querySelector<HTMLElement>("h3.text-\\[28px\\]");
-    const techTableTbody = root.querySelector<HTMLElement>("table tbody");
-    if (pillBtns.length > 0 && techTitle && techTableTbody) {
-      const specsData = [
-        { name: "U-Surf 120", surface: "120 cm2", span: "328 mm", ar: "9", chord: "50 mm", thick: "5 mm" },
-        { name: "U-Surf 135", surface: "135 cm2", span: "350 mm", ar: "9", chord: "52 mm", thick: "5 mm" },
-        { name: "U-Surf 150", surface: "150 cm2", span: "370 mm", ar: "9", chord: "54 mm", thick: "5.5 mm" },
-      ];
+    const modelBuyButtons = root.querySelectorAll<HTMLButtonElement>(".btn-model-buy-now");
+    modelBuyButtons.forEach((btn) => {
+      btn.onclick = () => {
+        const size = btn.getAttribute("data-buy-size");
+        if (size) {
+          updateSizeSelection(size);
+        }
+        if (achatSec) {
+          achatSec.scrollIntoView({ behavior: "smooth" });
+        }
+      };
+    });
 
-      pillBtns.forEach((btn, idx) => {
-        btn.onclick = () => {
-          pillBtns.forEach((b, i) => {
-            if (i === idx) {
-              b.classList.remove("text-white");
-              b.classList.add("text-[#111111]", "bg-white");
-            } else {
-              b.classList.remove("text-[#111111]", "bg-white");
-              b.classList.add("text-white");
-            }
-          });
-          const d = specsData[idx];
-          if (d) {
-            techTitle.textContent = d.name;
-            const rows = techTableTbody.querySelectorAll("tr");
-            if (rows.length >= 5) {
-              const r0 = rows[0].querySelector("td");
-              if (r0) r0.textContent = d.surface;
-              const r1 = rows[1].querySelector("td");
-              if (r1) r1.textContent = d.span;
-              const r2 = rows[2].querySelector("td");
-              if (r2) r2.textContent = d.ar;
-              const r3 = rows[3].querySelector("td");
-              if (r3) r3.textContent = d.chord;
-              const r4 = rows[4].querySelector("td");
-              if (r4) r4.textContent = d.thick;
-            }
-          }
-        };
-      });
+    if (submitBtn) {
+      submitBtn.onclick = (e) => {
+        e.preventDefault();
+        window.location.href = `/contact?item=${encodeURIComponent(`AFS U Surf Stabilizer (${selectedSize})`)}`;
+      };
+    }
+
+    const achatForm = root.querySelector<HTMLFormElement>("#achat form");
+    if (achatForm) {
+      achatForm.onsubmit = (e) => {
+        e.preventDefault();
+        window.location.href = `/contact?item=${encodeURIComponent(`AFS U Surf Stabilizer (${selectedSize})`)}`;
+      };
     }
   }, []);
 
