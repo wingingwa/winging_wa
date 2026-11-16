@@ -22,10 +22,10 @@ export default function SilkDetailView() {
         const activateTab = (index: number) => {
           buttons.forEach((btn, idx) => {
             if (idx === index) {
-              btn.classList.add("!text-white", "border-b-2", "!border-[#ef0e0a]");
+              btn.classList.add("!text-white", "border-b-2", "!border-[#96217b]");
               btn.classList.remove("!text-[#777777]");
             } else {
-              btn.classList.remove("!text-white", "border-b-2", "!border-[#ef0e0a]");
+              btn.classList.remove("!text-white", "border-b-2", "!border-[#96217b]");
               btn.classList.add("!text-[#777777]");
             }
           });

@@ -11,6 +11,15 @@ export default function ProductContentView() {
     const root = containerRef.current;
     if (!root) return;
 
+    const videos = root.querySelectorAll("video");
+    videos.forEach((video) => {
+      video.muted = true;
+      video.playsInline = true;
+      video.loop = true;
+      video.autoplay = true;
+      video.play().catch(() => {});
+    });
+
     const rangeSection = root.querySelector("#range");
     if (rangeSection) {
       const buttons = rangeSection.querySelectorAll<HTMLButtonElement>("button");

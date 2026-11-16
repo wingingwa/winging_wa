@@ -69,6 +69,85 @@ const toggle = root.querySelector("#infinity-mast-toggle");
         };
       }
     }
+
+    const swiperSlides = root.querySelectorAll<HTMLElement>(".swiper-slide");
+    const thumbBtns = root.querySelectorAll<HTMLButtonElement>("button img[alt^='thumb-']");
+    if (swiperSlides.length > 0 && thumbBtns.length > 0) {
+      const parentThumbBtns = Array.from(thumbBtns).map((img) => img.closest("button")!);
+      const activateSlide = (slideIdx: number) => {
+        swiperSlides.forEach((slide, idx) => {
+          if (idx === slideIdx) {
+            slide.style.display = "flex";
+            slide.style.opacity = "1";
+          } else {
+            slide.style.display = "none";
+            slide.style.opacity = "0";
+          }
+        });
+        parentThumbBtns.forEach((btn, idx) => {
+          if (btn) {
+            if (idx === slideIdx) {
+              btn.classList.add("border-b-2", "border-[#D44841]");
+            } else {
+              btn.classList.remove("border-b-2", "border-[#D44841]");
+            }
+          }
+        });
+      };
+
+      parentThumbBtns.forEach((btn, idx) => {
+        if (btn) {
+          btn.onclick = () => activateSlide(idx);
+        }
+      });
+      activateSlide(0);
+    }
+
+    const pillBtns = root.querySelectorAll<HTMLButtonElement>(".rounded-full.bg-\\[\\#1F1F1F\\] button");
+    const techTitle = root.querySelector<HTMLElement>("h3.text-\\[28px\\]");
+    const techTableTbody = root.querySelector<HTMLElement>("table tbody");
+    if (pillBtns.length > 0 && techTitle && techTableTbody) {
+      const specsData = [
+        { name: "Ha Ultra 600", surface: "600 cm2", span: "980 mm", ar: "16", chord: "84 mm", thick: "10.8 mm" },
+        { name: "Ha Ultra 700", surface: "700 cm2", span: "1050 mm", ar: "15.8", chord: "88 mm", thick: "11.0 mm" },
+        { name: "Ha Ultra 800", surface: "800 cm2", span: "1120 mm", ar: "15.7", chord: "92 mm", thick: "11.2 mm" },
+        { name: "Ha Ultra 900", surface: "900 cm2", span: "1190 mm", ar: "15.7", chord: "96 mm", thick: "11.5 mm" },
+        { name: "Ha Ultra 1000", surface: "1000 cm2", span: "1250 mm", ar: "15.6", chord: "100 mm", thick: "11.8 mm" },
+        { name: "Ha Ultra 1150", surface: "1150 cm2", span: "1320 mm", ar: "15.1", chord: "106 mm", thick: "12.0 mm" },
+        { name: "Ha Ultra 1300", surface: "1300 cm2", span: "1390 mm", ar: "14.9", chord: "112 mm", thick: "12.2 mm" },
+      ];
+
+      pillBtns.forEach((btn, idx) => {
+        btn.onclick = () => {
+          pillBtns.forEach((b, i) => {
+            if (i === idx) {
+              b.classList.remove("text-white");
+              b.classList.add("text-[#111111]", "bg-white");
+            } else {
+              b.classList.remove("text-[#111111]", "bg-white");
+              b.classList.add("text-white");
+            }
+          });
+          const d = specsData[idx];
+          if (d) {
+            techTitle.textContent = d.name;
+            const rows = techTableTbody.querySelectorAll("tr");
+            if (rows.length >= 5) {
+              const r0 = rows[0].querySelector("td");
+              if (r0) r0.textContent = d.surface;
+              const r1 = rows[1].querySelector("td");
+              if (r1) r1.textContent = d.span;
+              const r2 = rows[2].querySelector("td");
+              if (r2) r2.textContent = d.ar;
+              const r3 = rows[3].querySelector("td");
+              if (r3) r3.textContent = d.chord;
+              const r4 = rows[4].querySelector("td");
+              if (r4) r4.textContent = d.thick;
+            }
+          }
+        };
+      });
+    }
   }, []);
 
   return (

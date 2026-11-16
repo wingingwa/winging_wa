@@ -69,6 +69,21 @@ const toggle = root.querySelector("#infinity-mast-toggle");
         };
       }
     }
+
+    const optionGroups = root.querySelectorAll<HTMLElement>(".mb-3.flex.flex-wrap, .mb-2.flex.flex-wrap");
+    optionGroups.forEach((group) => {
+      const btns = group.querySelectorAll<HTMLButtonElement>("button");
+      btns.forEach((btn) => {
+        btn.onclick = () => {
+          btns.forEach((b) => {
+            b.setAttribute("aria-pressed", "false");
+            b.classList.remove("border-black", "border-[#ef0e0a]", "bg-black", "text-white");
+          });
+          btn.setAttribute("aria-pressed", "true");
+          btn.classList.add("border-[#ef0e0a]");
+        };
+      });
+    });
   }, []);
 
   return (

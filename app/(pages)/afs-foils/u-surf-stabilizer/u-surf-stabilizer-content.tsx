@@ -69,6 +69,81 @@ const toggle = root.querySelector("#infinity-mast-toggle");
         };
       }
     }
+
+    const swiperSlides = root.querySelectorAll<HTMLElement>(".swiper-slide");
+    const thumbBtns = root.querySelectorAll<HTMLButtonElement>("button img[alt^='thumb-']");
+    if (swiperSlides.length > 0 && thumbBtns.length > 0) {
+      const parentThumbBtns = Array.from(thumbBtns).map((img) => img.closest("button")!);
+      const activateSlide = (slideIdx: number) => {
+        swiperSlides.forEach((slide, idx) => {
+          if (idx === slideIdx) {
+            slide.style.display = "flex";
+            slide.style.opacity = "1";
+          } else {
+            slide.style.display = "none";
+            slide.style.opacity = "0";
+          }
+        });
+        parentThumbBtns.forEach((btn, idx) => {
+          if (btn) {
+            if (idx === slideIdx) {
+              btn.classList.add("border-b-2", "border-[#D44841]");
+            } else {
+              btn.classList.remove("border-b-2", "border-[#D44841]");
+            }
+          }
+        });
+      };
+
+      parentThumbBtns.forEach((btn, idx) => {
+        if (btn) {
+          btn.onclick = () => activateSlide(idx);
+        }
+      });
+      activateSlide(0);
+    }
+
+    const pillBtns = root.querySelectorAll<HTMLButtonElement>(".rounded-full.bg-\\[\\#1F1F1F\\] button");
+    const techTitle = root.querySelector<HTMLElement>("h3.text-\\[28px\\]");
+    const techTableTbody = root.querySelector<HTMLElement>("table tbody");
+    if (pillBtns.length > 0 && techTitle && techTableTbody) {
+      const specsData = [
+        { name: "U-Surf 120", surface: "120 cm2", span: "328 mm", ar: "9", chord: "50 mm", thick: "5 mm" },
+        { name: "U-Surf 135", surface: "135 cm2", span: "350 mm", ar: "9", chord: "52 mm", thick: "5 mm" },
+        { name: "U-Surf 150", surface: "150 cm2", span: "370 mm", ar: "9", chord: "54 mm", thick: "5.5 mm" },
+      ];
+
+      pillBtns.forEach((btn, idx) => {
+        btn.onclick = () => {
+          pillBtns.forEach((b, i) => {
+            if (i === idx) {
+              b.classList.remove("text-white");
+              b.classList.add("text-[#111111]", "bg-white");
+            } else {
+              b.classList.remove("text-[#111111]", "bg-white");
+              b.classList.add("text-white");
+            }
+          });
+          const d = specsData[idx];
+          if (d) {
+            techTitle.textContent = d.name;
+            const rows = techTableTbody.querySelectorAll("tr");
+            if (rows.length >= 5) {
+              const r0 = rows[0].querySelector("td");
+              if (r0) r0.textContent = d.surface;
+              const r1 = rows[1].querySelector("td");
+              if (r1) r1.textContent = d.span;
+              const r2 = rows[2].querySelector("td");
+              if (r2) r2.textContent = d.ar;
+              const r3 = rows[3].querySelector("td");
+              if (r3) r3.textContent = d.chord;
+              const r4 = rows[4].querySelector("td");
+              if (r4) r4.textContent = d.thick;
+            }
+          }
+        };
+      });
+    }
   }, []);
 
   return (

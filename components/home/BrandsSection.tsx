@@ -66,8 +66,8 @@ const BrandsSection = () => {
 
             <div className="relative w-full h-48 sm:h-56 my-5 rounded-2xl bg-[#ECECEC] p-4 flex items-center justify-center overflow-hidden transition-all duration-500 group-hover:scale-[1.01]">
               <Image
-                src="/stock/AFSStream-front.png"
-                alt="AFS Stream Carbon Wing"
+                src="/brands/afs-enduro-home.png"
+                alt="AFS Enduro Front Wing"
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-contain p-2 transition-transform duration-500 group-hover:scale-105 select-none"
@@ -133,7 +133,7 @@ const BrandsSection = () => {
 
             <div className="relative w-full h-48 sm:h-56 my-5 rounded-2xl bg-[#ECECEC] p-4 flex items-center justify-center overflow-hidden transition-all duration-500 group-hover:scale-[1.01]">
               <Image
-                src="/manta-evo.png"
+                src="/brands/manta-home-preview.png"
                 alt="Manta TakeOff Evo Kit"
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
