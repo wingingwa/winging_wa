@@ -64,13 +64,13 @@ const BrandsSection = () => {
               </div>
             </div>
 
-            <div className="relative w-full h-48 sm:h-56 my-5 rounded-2xl bg-[#ECECEC] p-4 flex items-center justify-center overflow-hidden transition-all duration-500 group-hover:scale-[1.01]">
+            <div className="relative w-full h-60 sm:h-72 my-5 rounded-2xl bg-black border border-white/10 flex items-center justify-center overflow-hidden transition-all duration-500 group-hover:scale-[1.01]">
               <Image
                 src="/brands/afs-enduro-home.png"
                 alt="AFS Enduro Front Wing"
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
-                className="object-contain p-2 transition-transform duration-500 group-hover:scale-105 select-none"
+                className="object-contain transition-transform duration-500 group-hover:scale-105 select-none"
               />
             </div>
 
@@ -131,13 +131,13 @@ const BrandsSection = () => {
               </div>
             </div>
 
-            <div className="relative w-full h-48 sm:h-56 my-5 rounded-2xl bg-[#ECECEC] p-4 flex items-center justify-center overflow-hidden transition-all duration-500 group-hover:scale-[1.01]">
+            <div className="relative w-full h-60 sm:h-72 my-5 rounded-2xl bg-black border border-white/10 flex items-center justify-center overflow-hidden transition-all duration-500 group-hover:scale-[1.01]">
               <Image
                 src="/brands/manta-home-preview.png"
                 alt="Manta TakeOff Evo Kit"
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
-                className="object-contain p-2 transition-transform duration-500 group-hover:scale-105 select-none"
+                className="object-cover transition-transform duration-500 group-hover:scale-105 select-none"
               />
             </div>
 

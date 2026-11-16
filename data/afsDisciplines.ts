@@ -9,13 +9,13 @@ export const afsDisciplines: AfsDiscipline[] = [
   {
     id: "foils",
     name: "Foils",
-    count: 42,
+    count: 18,
     image: "https://api.afs-foiling.com/wp-content/uploads/2025/06/surf-foil-1024x703.jpg",
   },
   {
     id: "wings",
     name: "Wings",
-    count: 4,
+    count: 2,
     image: "/wing-photo.png",
   },
 ];

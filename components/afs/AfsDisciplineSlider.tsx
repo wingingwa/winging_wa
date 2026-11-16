@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useMemo } from "react";
 import Image from "next/image";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation } from "swiper/modules";
@@ -9,6 +9,7 @@ import "swiper/css";
 import "swiper/css/navigation";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { afsDisciplines, AfsDiscipline } from "@/data/afsDisciplines";
+import { afsProducts } from "@/data/afsProducts";
 import { cn } from "@/lib/utils";
 
 interface AfsDisciplineSliderProps {
@@ -23,6 +24,15 @@ const AfsDisciplineSlider = ({
   const swiperRef = useRef<SwiperType | null>(null);
   const [isBeginning, setIsBeginning] = useState(true);
   const [isEnd, setIsEnd] = useState(false);
+
+  const disciplineCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    afsProducts.forEach((product) => {
+      const key = product.category.toLowerCase();
+      counts[key] = (counts[key] || 0) + 1;
+    });
+    return counts;
+  }, []);
 
   return (
     <section className="relative w-full py-8 sm:py-10 bg-[#4A505B] border-b border-white/15 overflow-hidden">
@@ -93,6 +103,8 @@ const AfsDisciplineSlider = ({
           >
             {afsDisciplines.map((item) => {
               const isSelected = selectedDiscipline === item.name;
+              const productCount =
+                disciplineCounts[item.name.toLowerCase()] ?? item.count;
 
               return (
                 <SwiperSlide key={item.id} className="h-auto">
@@ -126,7 +138,7 @@ const AfsDisciplineSlider = ({
                         {item.name}
                       </span>
                       <span className="text-xs sm:text-sm font-semibold text-white/75 drop-shadow-xs">
-                        {item.count}
+                        {productCount}
                       </span>
                     </div>
 
