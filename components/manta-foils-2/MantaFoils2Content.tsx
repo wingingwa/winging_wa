@@ -6,7 +6,7 @@ import { PhoneCall, Mail } from "lucide-react";
 import "./manta-foils-2.css";
 import { mantaFoilsFirstTwoSectionsHtml } from "./mantaFoilsFirstTwoSectionsHtml";
 
-const brochurePages = Array.from({ length: 17 }, (_, i) => ({
+const brochurePages = Array.from({ length: 21 }, (_, i) => ({
   num: i + 1,
   src: `/manta-brochure/page-${String(i + 1).padStart(2, "0")}.png`,
 }));

@@ -12,6 +12,12 @@ export default function SilkDetailView() {
     if (!root) return;
 
     const rangeSection = root.querySelector("#range");
+    const exploreBtn = root.querySelector<HTMLButtonElement>(".hero-actions .btn-primary");
+    if (exploreBtn && rangeSection) {
+      exploreBtn.onclick = () => {
+        rangeSection.scrollIntoView({ behavior: "smooth" });
+      };
+    }
     if (rangeSection) {
       const buttons = rangeSection.querySelectorAll<HTMLButtonElement>("button");
       const tabPanels = rangeSection.querySelectorAll<HTMLDivElement>(

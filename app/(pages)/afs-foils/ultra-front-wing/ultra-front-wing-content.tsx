@@ -71,23 +71,31 @@ const toggle = root.querySelector("#infinity-mast-toggle");
     }
 
     const swiperSlides = root.querySelectorAll<HTMLElement>(".swiper-slide");
-    const thumbBtns = root.querySelectorAll<HTMLButtonElement>("button img[alt^='thumb-']");
-    if (swiperSlides.length > 0 && thumbBtns.length > 0) {
-      const parentThumbBtns = Array.from(thumbBtns).map((img) => img.closest("button")!);
+    const thumbImgs = root.querySelectorAll<HTMLImageElement>("button img[alt^='thumb-']");
+    if (swiperSlides.length > 0 && thumbImgs.length > 0) {
+      const parentThumbBtns = Array.from(thumbImgs).map((img) => img.closest("button")!);
       const activateSlide = (slideIdx: number) => {
         swiperSlides.forEach((slide, idx) => {
           if (idx === slideIdx) {
-            slide.style.display = "flex";
-            slide.style.opacity = "1";
+            slide.classList.add("is-active");
+            slide.style.setProperty("display", "flex", "important");
+            slide.style.setProperty("opacity", "1", "important");
+            slide.style.setProperty("visibility", "visible", "important");
           } else {
-            slide.style.display = "none";
-            slide.style.opacity = "0";
+            slide.classList.remove("is-active");
+            slide.style.setProperty("display", "none", "important");
+            slide.style.setProperty("opacity", "0", "important");
+            slide.style.setProperty("visibility", "hidden", "important");
           }
         });
+        const glowSpan = root.querySelector("button span.blur-\\[20px\\]");
         parentThumbBtns.forEach((btn, idx) => {
           if (btn) {
             if (idx === slideIdx) {
               btn.classList.add("border-b-2", "border-[#D44841]");
+              if (glowSpan && btn !== glowSpan.parentElement) {
+                btn.prepend(glowSpan);
+              }
             } else {
               btn.classList.remove("border-b-2", "border-[#D44841]");
             }
