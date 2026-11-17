@@ -376,9 +376,9 @@ const AfsCatalog = ({
                     className="w-full accent-[#ef0e0a] bg-white/20 h-1.5 rounded-lg cursor-pointer"
                   />
                   <div className="flex items-center justify-between text-xs font-semibold text-slate-300">
-                    <span>1,00€</span>
+                    <span>1,00</span>
                     <span className="text-white font-bold">
-                      {maxPrice.toLocaleString("de-DE")},00€
+                      {maxPrice.toLocaleString("de-DE")},00
                     </span>
                   </div>
                 </div>

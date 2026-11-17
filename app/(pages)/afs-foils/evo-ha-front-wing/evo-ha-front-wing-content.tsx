@@ -85,7 +85,7 @@ export default function ProductContentView() {
       if (surface === "HA1000") {
         if (radio1000) radio1000.checked = true;
         if (radio750) radio750.checked = false;
-        if (priceDisplay) priceDisplay.textContent = "829,00 €";
+        if (priceDisplay) priceDisplay.textContent = "829,00";
         if (submitBtn) submitBtn.textContent = "Buy Now / Enquire & Order (HA1000)";
         if (label1000) {
           label1000.className = "surface-option flex w-full items-center cursor-pointer rounded-[4px] transition-all gap-4 border-2 border-[#111] bg-[#f8f9fa] px-5 py-4 shadow-sm";
@@ -96,7 +96,7 @@ export default function ProductContentView() {
       } else {
         if (radio750) radio750.checked = true;
         if (radio1000) radio1000.checked = false;
-        if (priceDisplay) priceDisplay.textContent = "739,00 €";
+        if (priceDisplay) priceDisplay.textContent = "739,00";
         if (submitBtn) submitBtn.textContent = "Buy Now / Enquire & Order (HA750)";
         if (label750) {
           label750.className = "surface-option flex w-full items-center cursor-pointer rounded-[4px] transition-all gap-4 border-2 border-[#111] bg-[#f8f9fa] px-5 py-4 shadow-sm";
