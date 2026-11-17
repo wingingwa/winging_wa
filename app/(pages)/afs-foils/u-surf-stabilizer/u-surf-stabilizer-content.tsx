@@ -255,21 +255,31 @@ export default function ProductContentView() {
 
     const modelBuyButtons = root.querySelectorAll<HTMLButtonElement>(".btn-model-buy-now");
     modelBuyButtons.forEach((btn) => {
-      btn.onclick = () => {
-        const size = btn.getAttribute("data-buy-size");
-        if (size) {
-          updateSizeSelection(size);
-        }
-        if (achatSec) {
-          achatSec.scrollIntoView({ behavior: "smooth" });
-        }
+      btn.onclick = (e) => {
+        e.preventDefault();
+        const size = btn.getAttribute("data-buy-size") || selectedSize;
+        window.location.href = `/contact?item=${encodeURIComponent(`AFS U-Surf Stabilizer (${size})`)}`;
       };
     });
+
+    const modelesSec = root.querySelector("#modeles");
+    if (modelesSec) {
+      const buttons = modelesSec.querySelectorAll<HTMLButtonElement>("button");
+      buttons.forEach((btn) => {
+        if (btn.textContent?.toLowerCase().includes("buy")) {
+          btn.onclick = (e) => {
+            e.preventDefault();
+            const size = btn.getAttribute("data-buy-size") || selectedSize;
+            window.location.href = `/contact?item=${encodeURIComponent(`AFS U-Surf Stabilizer (${size})`)}`;
+          };
+        }
+      });
+    }
 
     if (submitBtn) {
       submitBtn.onclick = (e) => {
         e.preventDefault();
-        window.location.href = `/contact?item=${encodeURIComponent(`AFS U Surf Stabilizer (${selectedSize})`)}`;
+        window.location.href = `/contact?item=${encodeURIComponent(`AFS U-Surf Stabilizer (${selectedSize})`)}`;
       };
     }
 
@@ -277,7 +287,7 @@ export default function ProductContentView() {
     if (achatForm) {
       achatForm.onsubmit = (e) => {
         e.preventDefault();
-        window.location.href = `/contact?item=${encodeURIComponent(`AFS U Surf Stabilizer (${selectedSize})`)}`;
+        window.location.href = `/contact?item=${encodeURIComponent(`AFS U-Surf Stabilizer (${selectedSize})`)}`;
       };
     }
   }, []);
