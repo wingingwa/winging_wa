@@ -41,7 +41,7 @@ const Footer = () => {
                   <FaFacebookF className="size-4" />
                 </Link>
                 <Link
-                  href="https://www.instagram.com/winging_wa"
+                  href="https://www.instagram.com/wix"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Instagram"
