@@ -8,7 +8,7 @@ import { mantaFoilsFirstTwoSectionsHtml } from "./mantaFoilsFirstTwoSectionsHtml
 
 const brochurePages = Array.from({ length: 21 }, (_, i) => ({
   num: i + 1,
-  src: `/manta-brochure/page-${String(i + 1).padStart(2, "0")}.png`,
+  src: `/manta-brochure/page-${String(i + 2).padStart(2, "0")}.png`,
 }));
 
 const MantaFoils2Content = () => {

@@ -46,7 +46,7 @@ export default function ProductContentView() {
         activateTab(0);
       }
     }
-const toggle = root.querySelector("#infinity-mast-toggle");
+    const toggle = root.querySelector("#infinity-mast-toggle");
     if (toggle) {
       const btnManta = root.querySelector<HTMLButtonElement>("#btn-tab-manta");
       const btnFoilDrive = root.querySelector<HTMLButtonElement>("#btn-tab-foildrive");
