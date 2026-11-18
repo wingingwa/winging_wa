@@ -89,15 +89,19 @@
 
 .hr-carbon-mast-page .hero {
   position: relative !important;
-  display: grid !important;
-  grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+  display: flex !important;
+  flex-direction: column !important;
   align-items: center !important;
+  justify-content: center !important;
   min-height: calc(100vh - 80px) !important;
-  overflow: visible !important;
+  width: 100% !important;
+  overflow: hidden !important;
+  padding-top: 4vh !important;
+  padding-bottom: 6rem !important;
 }
 
 .hr-carbon-mast-page .img_col_pin {
-  grid-column: 3 / span 2 !important;
+  position: relative !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -105,34 +109,68 @@
   width: 100% !important;
   max-width: 435px !important;
   margin: 0 auto !important;
-  padding-top: 10vh !important;
-}
-
-@media (max-width: 767px) {
-  .hr-carbon-mast-page .img_col_pin {
-    grid-column: 1 / span 6 !important;
-  }
 }
 
 .hr-carbon-mast-page .hero_h {
   position: absolute !important;
-  top: 45% !important;
-  left: 50% !important;
-  transform: translate(-50%, -50%) !important;
+  top: 50% !important;
+  left: 0 !important;
+  right: 0 !important;
+  margin: 0 auto !important;
+  transform: translateY(-50%) !important;
   width: 100% !important;
+  max-width: 800px !important;
   text-align: center !important;
   z-index: 10 !important;
   pointer-events: none !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
+  justify-content: center !important;
   gap: 16px !important;
+  padding: 0 20px !important;
+}
+
+.hr-carbon-mast-page .hero_h h2,
+.hr-carbon-mast-page .hero_h p {
+  text-align: center !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
 }
 
 @media (max-width: 767px) {
   .hr-carbon-mast-page .hero_h {
-    top: 30% !important;
-    padding: 0 20px !important;
+    top: 40% !important;
+    padding: 0 16px !important;
+  }
+}
+
+.hr-carbon-mast-page .hero_bottom_bar {
+  position: absolute !important;
+  bottom: 2rem !important;
+  left: 0 !important;
+  right: 0 !important;
+  margin: 0 auto !important;
+  width: 100% !important;
+  max-width: 1300px !important;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  z-index: 10 !important;
+  padding: 0 24px !important;
+  transform: none !important;
+}
+
+@media (max-width: 767px) {
+  .hr-carbon-mast-page .hero_bottom_bar {
+    flex-direction: column !important;
+    gap: 10px !important;
+    bottom: 1rem !important;
+    text-align: center !important;
+  }
+  .hr-carbon-mast-page .hero_bottom_bar > div {
+    text-align: center !important;
   }
 }
 
@@ -141,21 +179,37 @@
   display: grid !important;
   grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
   width: 100% !important;
-  min-height: calc(100vh - 80px) !important;
+  min-height: calc(90vh - 80px) !important;
   align-items: center !important;
+  gap: clamp(1rem, 2.5vw, 3rem) !important;
 }
 
-.hr-carbon-mast-page .profile .profile_inner:first-child {
+.hr-carbon-mast-page .profile .profile_left {
   grid-column: 1 / span 2 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
 }
 
-.hr-carbon-mast-page .profile .profile_inner:last-child {
+.hr-carbon-mast-page .profile .profile_center {
+  grid-column: 3 / span 2 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.hr-carbon-mast-page .profile .profile_right {
   grid-column: 5 / span 2 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
 }
 
-@media (max-width: 767px) {
-  .hr-carbon-mast-page .profile .profile_inner:first-child,
-  .hr-carbon-mast-page .profile .profile_inner:last-child {
+@media (max-width: 900px) {
+  .hr-carbon-mast-page .profile .profile_left,
+  .hr-carbon-mast-page .profile .profile_center,
+  .hr-carbon-mast-page .profile .profile_right {
     grid-column: 1 / span 6 !important;
   }
 }
@@ -173,9 +227,12 @@
 }
 
 .hr-carbon-mast-page .choose {
+  position: relative !important;
   display: grid !important;
   grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
   align-items: flex-end !important;
+  gap: clamp(1.5rem, 2.5vw, 3.5rem) !important;
+  width: 100% !important;
 }
 
 .hr-carbon-mast-page .choose_img_box {
@@ -183,11 +240,37 @@
   display: flex !important;
   align-items: flex-end !important;
   justify-content: center !important;
+  order: 1 !important;
+  width: 100% !important;
 }
 
-@media (max-width: 767px) {
+.hr-carbon-mast-page .choose_img {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+}
+
+.hr-carbon-mast-page .choose_content {
+  grid-column: 5 / span 2 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  order: 2 !important;
+  padding-left: 1.5rem !important;
+  padding-bottom: 2rem !important;
+}
+
+@media (max-width: 900px) {
   .hr-carbon-mast-page .choose_img_box {
     grid-column: 1 / span 6 !important;
+    order: 2 !important;
+  }
+  .hr-carbon-mast-page .choose_content {
+    grid-column: 1 / span 6 !important;
+    order: 1 !important;
+    padding-left: 0 !important;
+    margin-bottom: 2rem !important;
   }
 }
 
@@ -196,8 +279,17 @@
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  min-height: calc(100vh - 80px) !important;
+  min-height: calc(85vh - 80px) !important;
   overflow: hidden !important;
+  text-align: center !important;
+  padding: 4rem 1.5rem !important;
+}
+
+.hr-carbon-mast-page .final_h {
+  position: relative !important;
+  z-index: 2 !important;
+  max-width: 1200px !important;
+  margin: 0 auto !important;
 }
 
 .hr-carbon-mast-page .final .size-img {
@@ -206,8 +298,10 @@
   left: 50% !important;
   transform: translate(-50%, -50%) rotate(-24deg) !important;
   width: 100% !important;
-  max-width: 1200px !important;
+  max-width: 1300px !important;
   pointer-events: none !important;
+  z-index: 1 !important;
+  opacity: 0.35 !important;
 }
 
 .hr-carbon-mast-page .fuselink {
@@ -222,6 +316,7 @@
   background-position: center !important;
   background-repeat: no-repeat !important;
   width: 100% !important;
+  min-height: 520px !important;
   border-radius: 4px !important;
   overflow: hidden !important;
 }
