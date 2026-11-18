@@ -148,11 +148,14 @@
   border-radius: 9999px !important;
   display: flex !important;
   align-items: center !important;
+  margin-top: 24px !important;
 }
 
 .u-glide-stabilizer-page .spec-pill {
   transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease !important;
   cursor: pointer !important;
+  pointer-events: auto !important;
+  touch-action: manipulation !important;
   outline: none !important;
   border: none !important;
   border-radius: 9999px !important;

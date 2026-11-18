@@ -81,7 +81,8 @@ export default function ProductContentView() {
         thickness: "4.5 mm",
         materials: "High-modulus carbon + high-modulus carbon core",
         bestFor: "Downwind, glide",
-        image: "/afs-foils/u-glide-stabilizer/uglide39_00027c00.png"
+        image: "/afs-foils/u-glide-stabilizer/uglide39_00027c00.png",
+        desc: "<span class=\"text-white font-bold\">U-GLIDE 39</span> (39 cm span / 111 cm²) — pure glide, efficiency, and line control — with a touch of carving when you choose to push it."
       },
       {
         size: "41",
@@ -90,7 +91,8 @@ export default function ProductContentView() {
         thickness: "5.0 mm",
         materials: "High-modulus carbon + high-modulus carbon core",
         bestFor: "Downwind, glide",
-        image: "/afs-foils/u-glide-stabilizer/UGlide_0003d565.png"
+        image: "/afs-foils/u-glide-stabilizer/UGlide_0003d565.png",
+        desc: "<span class=\"text-white font-bold\">U-GLIDE 41</span> (41 cm span / 122 cm²) — maximum glide efficiency and pitch stability with minimal energy input."
       },
       {
         size: "43",
@@ -99,7 +101,8 @@ export default function ProductContentView() {
         thickness: "5.0 mm",
         materials: "High-modulus carbon + high-modulus carbon core",
         bestFor: "Downwind, glide",
-        image: "/afs-foils/u-glide-stabilizer/uglide43_00018b76.png"
+        image: "/afs-foils/u-glide-stabilizer/uglide43_00018b76.png",
+        desc: "<span class=\"text-white font-bold\">U-GLIDE 43</span> (43 cm span / 134 cm²) — extended downwind glide in light conditions, maximum lift and line control."
       }
     ];
 
@@ -110,6 +113,7 @@ export default function ProductContentView() {
     const specMat = root.querySelector<HTMLElement>("#spec-mat");
     const specBest = root.querySelector<HTMLElement>("#spec-best");
     const techImg = root.querySelector<HTMLImageElement>("#tech-spec-img");
+    const specDesc = root.querySelector<HTMLElement>("#spec-info-desc");
 
     const selectSpec = (idx: number) => {
       const data = specsData[idx] || specsData[0];
@@ -118,9 +122,13 @@ export default function ProductContentView() {
         if (pIdx === idx) {
           p.className = "spec-pill active uppercase cursor-pointer relative z-10 px-[14px] py-3 rounded-full whitespace-nowrap text-sm md:text-4 font-semibold uppercase transition-colors bg-white text-[#111111]";
           p.setAttribute("data-active", "true");
+          p.style.backgroundColor = "#ffffff";
+          p.style.color = "#111111";
         } else {
           p.className = "spec-pill uppercase cursor-pointer relative z-10 px-[14px] py-3 rounded-full whitespace-nowrap text-sm md:text-4 font-semibold uppercase transition-colors text-white hover:text-white/80";
           p.removeAttribute("data-active");
+          p.style.backgroundColor = "transparent";
+          p.style.color = "#ffffff";
         }
       });
 
@@ -133,10 +141,17 @@ export default function ProductContentView() {
         techImg.src = data.image;
         techImg.alt = `AFS U GLide ${data.size}`;
       }
+      if (specDesc) {
+        specDesc.innerHTML = data.desc;
+      }
     };
 
     pills.forEach((pill, idx) => {
       pill.onclick = (e) => {
+        e.preventDefault();
+        selectSpec(idx);
+      };
+      pill.onpointerdown = (e) => {
         e.preventDefault();
         selectSpec(idx);
       };

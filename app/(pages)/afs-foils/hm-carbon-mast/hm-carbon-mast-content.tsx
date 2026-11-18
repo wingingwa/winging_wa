@@ -11,64 +11,99 @@ export default function ProductContentView() {
     const root = containerRef.current;
     if (!root) return;
 
-    const rangeSection = root.querySelector("#range");
-    if (rangeSection) {
-      const buttons = rangeSection.querySelectorAll<HTMLButtonElement>("button");
-      const tabPanels = rangeSection.querySelectorAll<HTMLDivElement>(
-        ".transition-all.duration-300"
-      );
-
-      if (buttons.length > 0 && tabPanels.length > 0) {
-        const activateTab = (index: number) => {
-          buttons.forEach((btn, idx) => {
-            if (idx === index) {
-              btn.classList.add("!text-white", "border-b-2", "!border-[#ef0e0a]");
-              btn.classList.remove("!text-[#777777]");
-            } else {
-              btn.classList.remove("!text-white", "border-b-2", "!border-[#ef0e0a]");
-              btn.classList.add("!text-[#777777]");
-            }
-          });
-
-          tabPanels.forEach((panel, idx) => {
-            if (idx === index) {
-              panel.classList.remove("hidden");
-            } else {
-              panel.classList.add("hidden");
-            }
-          });
-        };
-
-        buttons.forEach((btn, idx) => {
-          btn.onclick = () => activateTab(idx);
-        });
-
-        activateTab(0);
+    const galleryImages = [
+      {
+        src: "/afs-foils/hm-carbon-mast/HM85-1-1d4d3.png",
+        srcset:
+          "/afs-foils/hm-carbon-mast/HM85-1-1d045.png 384w, /afs-foils/hm-carbon-mast/HM85-1-174f0.png 640w, /afs-foils/hm-carbon-mast/HM85-1-14c9c.png 750w, /afs-foils/hm-carbon-mast/HM85-1-13d75.png 828w, /afs-foils/hm-carbon-mast/HM85-1-1b8d4.png 1080w, /afs-foils/hm-carbon-mast/HM85-1-1abd5.png 1200w, /afs-foils/hm-carbon-mast/HM85-1-13ef4.png 1920w, /afs-foils/hm-carbon-mast/HM85-1-14caf.png 2048w, /afs-foils/hm-carbon-mast/HM85-1-1d4d3.png 3840w",
+        alt: "HM Carbon Mast (85 HM)"
+      },
+      {
+        src: "/afs-foils/hm-carbon-mast/HM80-1-1cf90.png",
+        srcset:
+          "/afs-foils/hm-carbon-mast/HM80-1-11d8d.png 384w, /afs-foils/hm-carbon-mast/HM80-1-13f51.png 640w, /afs-foils/hm-carbon-mast/HM80-1-1dbf8.png 750w, /afs-foils/hm-carbon-mast/HM80-1-1709b.png 828w, /afs-foils/hm-carbon-mast/HM80-1-10e8a.png 1080w, /afs-foils/hm-carbon-mast/HM80-1-10763.png 1200w, /afs-foils/hm-carbon-mast/HM80-1-145aa.png 1920w, /afs-foils/hm-carbon-mast/HM80-1-13685.png 2048w, /afs-foils/hm-carbon-mast/HM80-1-1cf90.png 3840w",
+        alt: "HM Carbon Mast (80 HM)"
       }
-    }
-const toggle = root.querySelector("#infinity-mast-toggle");
-    if (toggle) {
-      const btnManta = root.querySelector<HTMLButtonElement>("#btn-tab-manta");
-      const btnFoilDrive = root.querySelector<HTMLButtonElement>("#btn-tab-foildrive");
-      const panelManta = root.querySelector<HTMLDivElement>("#infinity-panel-manta");
-      const panelFoilDrive = root.querySelector<HTMLDivElement>("#infinity-panel-foildrive");
+    ];
 
-      if (btnManta && btnFoilDrive && panelManta && panelFoilDrive) {
-        btnManta.onclick = () => {
-          btnManta.className = "px-4 py-1.5 text-xs font-bold rounded-md transition-all bg-[#ef0e0a] text-white";
-          btnFoilDrive.className = "px-4 py-1.5 text-xs font-bold rounded-md transition-all text-[#888] hover:text-white";
-          panelManta.classList.remove("hidden");
-          panelFoilDrive.classList.add("hidden");
-        };
+    let currentSlide = 0;
+    const galleryImg = root.querySelector<HTMLImageElement>("#product-gallery-img");
+    const prevBtn = root.querySelector<HTMLButtonElement>("#gallery-prev-btn");
+    const nextBtn = root.querySelector<HTMLButtonElement>("#gallery-next-btn");
+    const counter = root.querySelector<HTMLElement>("#gallery-counter");
 
-        btnFoilDrive.onclick = () => {
-          btnFoilDrive.className = "px-4 py-1.5 text-xs font-bold rounded-md transition-all bg-[#ef0e0a] text-white";
-          btnManta.className = "px-4 py-1.5 text-xs font-bold rounded-md transition-all text-[#888] hover:text-white";
-          panelFoilDrive.classList.remove("hidden");
-          panelManta.classList.add("hidden");
-        };
+    const updateGallery = (idx: number) => {
+      currentSlide = idx;
+      const data = galleryImages[idx];
+      if (!data) return;
+
+      if (galleryImg) {
+        galleryImg.src = data.src;
+        galleryImg.srcset = data.srcset;
+        galleryImg.alt = data.alt;
       }
+      if (counter) {
+        counter.textContent = `${idx + 1} / ${galleryImages.length}`;
+      }
+
+      if (prevBtn) {
+        if (idx === 0) {
+          prevBtn.classList.add("opacity-30");
+        } else {
+          prevBtn.classList.remove("opacity-30");
+        }
+      }
+      if (nextBtn) {
+        if (idx === galleryImages.length - 1) {
+          nextBtn.classList.add("opacity-30");
+        } else {
+          nextBtn.classList.remove("opacity-30");
+        }
+      }
+    };
+
+    if (prevBtn) {
+      prevBtn.onclick = (e) => {
+        e.preventDefault();
+        const nextIdx = (currentSlide - 1 + galleryImages.length) % galleryImages.length;
+        updateGallery(nextIdx);
+      };
+      prevBtn.onpointerdown = (e) => {
+        e.preventDefault();
+        const nextIdx = (currentSlide - 1 + galleryImages.length) % galleryImages.length;
+        updateGallery(nextIdx);
+      };
     }
+
+    if (nextBtn) {
+      nextBtn.onclick = (e) => {
+        e.preventDefault();
+        const nextIdx = (currentSlide + 1) % galleryImages.length;
+        updateGallery(nextIdx);
+      };
+      nextBtn.onpointerdown = (e) => {
+        e.preventDefault();
+        const nextIdx = (currentSlide + 1) % galleryImages.length;
+        updateGallery(nextIdx);
+      };
+    }
+
+    const buyButtons = root.querySelectorAll<HTMLButtonElement>(".btn-model-buy-now");
+    buyButtons.forEach((btn) => {
+      btn.onclick = (e) => {
+        e.preventDefault();
+        const size = btn.getAttribute("data-buy-size") || "80 HM";
+        window.location.href = `/contact?item=${encodeURIComponent(`AFS HM Carbon Mast (${size})`)}`;
+      };
+    });
+
+    const contactButtons = root.querySelectorAll<HTMLElement>(".btn-contact-action");
+    contactButtons.forEach((btn) => {
+      btn.onclick = (e) => {
+        e.preventDefault();
+        window.location.href = `/contact?item=${encodeURIComponent("AFS HM Carbon Mast")}`;
+      };
+    });
   }, []);
 
   return (
