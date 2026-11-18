@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Plus } from "lucide-react";
@@ -8,12 +9,42 @@ import { staticInventory, StockItem } from "@/data/stockInventory";
 export type { StockItem };
 export { staticInventory };
 
-const StockCatalog = () => {
+export default function StockCatalog() {
+  const [items, setItems] = useState<StockItem[]>(staticInventory);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/equipment")
+      .then((res) => res.json())
+      .then((res) => {
+        if (res.success && Array.isArray(res.data) && res.data.length > 0) {
+          setItems(
+            res.data.map((item: any) => ({
+              id: item.id,
+              name: item.name,
+              brand: item.brand,
+              category: item.category,
+              price: item.price,
+              stockStatus: item.stockStatus,
+              image: item.image,
+              disciplines: ["Foil", "Winging"],
+              specs: item.specs || item.description || "Direct Warehouse Stock",
+              description: item.description || "",
+              badge: item.brand?.startsWith("AFS") ? "AFS Carbon" : "In Stock",
+              badgeColor: "bg-[#ef0e0a]/15 text-orange-300 border border-[#ef0e0a]/30",
+            }))
+          );
+        }
+      })
+      .catch((err) => console.error(err))
+      .finally(() => setIsLoading(false));
+  }, []);
+
   return (
     <section className="relative w-full py-12 lg:py-20 bg-[#4A505B] text-white">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 xl:px-16 flex flex-col gap-10">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8">
-          {staticInventory.map((item) => (
+          {items.map((item) => (
             <Link
               key={item.id}
               href={`/feature-equipment/${item.id}`}
@@ -69,6 +100,4 @@ const StockCatalog = () => {
       </div>
     </section>
   );
-};
-
-export default StockCatalog;
+}

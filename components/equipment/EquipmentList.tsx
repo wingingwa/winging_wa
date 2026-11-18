@@ -19,11 +19,14 @@ import {
   List,
   Package,
   Sparkles,
+  Copy,
+  EyeOff,
 } from "lucide-react";
 import {
   DashboardEquipmentItem,
-  initialDashboardEquipment,
   equipmentCategories,
+  equipmentBrands,
+  stockStatusOptions,
 } from "@/data/dashboardEquipment";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -37,6 +40,7 @@ export function EquipmentList() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [filterFeatured, setFilterFeatured] = useState<"all" | "featured" | "in-stock">("all");
+  const [filterPublish, setFilterPublish] = useState<"all" | "published" | "draft">("all");
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
 
   const [itemToDelete, setItemToDelete] = useState<DashboardEquipmentItem | null>(null);
@@ -46,11 +50,17 @@ export function EquipmentList() {
 
   const fetchEquipment = () => {
     setIsLoading(true);
-    fetch("/api/equipment")
+    fetch("/api/equipment?all=true")
       .then((res) => res.json())
       .then((res) => {
         if (res.success && res.data) {
-          setEquipment(res.data);
+          setEquipment(
+            res.data.map((item: any) => ({
+              ...item,
+              published: item.published !== undefined ? Boolean(item.published) : true,
+              specs: item.specs || item.description || "Direct Warehouse Stock",
+            }))
+          );
         }
       })
       .catch((err) => console.error(err))
@@ -65,7 +75,7 @@ export function EquipmentList() {
     setToastMessage(msg);
     setTimeout(() => {
       setToastMessage(null);
-    }, 3000);
+    }, 3200);
   };
 
   const handleSimulateLoading = () => {
@@ -79,7 +89,7 @@ export function EquipmentList() {
         item.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (item.sku && item.sku.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        item.specs.toLowerCase().includes(searchTerm.toLowerCase());
+        (item.specs && item.specs.toLowerCase().includes(searchTerm.toLowerCase()));
 
       const matchesCategory =
         selectedCategory === "All" || item.category === selectedCategory;
@@ -89,20 +99,27 @@ export function EquipmentList() {
         (filterFeatured === "featured" && item.featuredOnHome) ||
         (filterFeatured === "in-stock" && item.stockStatus === "In Stock (WA)");
 
-      return matchesSearch && matchesCategory && matchesFeatured;
+      const matchesPublish =
+        filterPublish === "all" ||
+        (filterPublish === "published" && item.published) ||
+        (filterPublish === "draft" && !item.published);
+
+      return matchesSearch && matchesCategory && matchesFeatured && matchesPublish;
     });
-  }, [equipment, searchTerm, selectedCategory, filterFeatured]);
+  }, [equipment, searchTerm, selectedCategory, filterFeatured, filterPublish]);
 
   const metrics = useMemo(() => {
     const total = equipment.length;
     const inStock = equipment.filter((e) => e.stockStatus === "In Stock (WA)").length;
     const featuredCount = equipment.filter((e) => e.featuredOnHome).length;
+    const publishedCount = equipment.filter((e) => e.published).length;
+    const draftCount = equipment.filter((e) => !e.published).length;
     const totalValue = equipment.reduce((acc, curr) => {
       const num = parseFloat(curr.price.replace(/[^0-9.]/g, "")) || 0;
       return acc + num;
     }, 0);
 
-    return { total, inStock, featuredCount, totalValue };
+    return { total, inStock, featuredCount, publishedCount, draftCount, totalValue };
   }, [equipment]);
 
   const toggleFeatured = async (id: string, e?: React.MouseEvent) => {
@@ -130,6 +147,55 @@ export function EquipmentList() {
       });
     } catch (err) {
       console.error(err);
+    }
+  };
+
+  const togglePublished = async (id: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    let nextValue = false;
+    setEquipment((prev) =>
+      prev.map((item) => {
+        if (item.id === id) {
+          nextValue = !item.published;
+          showToast(
+            nextValue
+              ? `"${item.name}" is now Published live on the website`
+              : `"${item.name}" moved to Draft (hidden from website visitors)`
+          );
+          return { ...item, published: nextValue };
+        }
+        return item;
+      })
+    );
+    try {
+      await fetch("/api/equipment", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, published: nextValue }),
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleClone = async (item: DashboardEquipmentItem, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    showToast(`Cloning "${item.name}"...`);
+    try {
+      const res = await fetch("/api/equipment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cloneFromId: item.id }),
+      });
+      const data = await res.json();
+      if (data.success && data.data) {
+        showToast(`Successfully cloned "${item.name}"! Edit it now to adjust size/price.`);
+        fetchEquipment();
+      } else {
+        showToast(data.error || "Failed to clone equipment");
+      }
+    } catch (err) {
+      showToast("Error cloning equipment");
     }
   };
 
@@ -162,7 +228,19 @@ export function EquipmentList() {
       await fetch("/api/equipment", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          id: payload.id,
+          name: payload.name,
+          brand: payload.brand,
+          category: payload.category,
+          price: payload.price,
+          stockStatus: payload.stockStatus,
+          image: payload.image,
+          specs: payload.specs,
+          description: payload.description,
+          featuredOnHome: payload.featuredOnHome,
+          published: payload.published,
+        }),
       });
     } catch (err) {
       console.error(err);
@@ -193,7 +271,7 @@ export function EquipmentList() {
             Featured Equipment Management
           </h1>
           <p className="text-sm text-slate-300">
-            Create, edit, delete, and control equipment displayed across the store and the home page featured slider.
+            Publish, unpublish, clone, edit categories, and control equipment displayed across the store and home page.
           </p>
         </div>
 
@@ -205,7 +283,7 @@ export function EquipmentList() {
             className="border-white/15 bg-white/5 text-white hover:bg-white/10 cursor-pointer text-xs"
           >
             <RefreshCw className={cn("size-3.5 mr-1.5", isLoading && "animate-spin")} />
-            Simulate Loading
+            Refresh
           </Button>
           <Link
             href="/dashboard/equipment/new"
@@ -228,21 +306,37 @@ export function EquipmentList() {
             <div className="text-2xl sm:text-3xl font-extrabold text-white">
               {metrics.total}
             </div>
-            <span className="text-xs text-slate-400">16 Stock Units</span>
+            <span className="text-xs text-slate-400">Total Listings</span>
           </CardContent>
         </Card>
 
         <Card className="bg-[#383D47] border-white/10 text-white">
           <CardHeader className="p-4 pb-2">
             <CardTitle className="text-xs uppercase tracking-wider text-slate-400 font-semibold">
-              In Stock (WA)
+              Live on Website
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4 pt-0 flex items-baseline justify-between">
-            <div className="text-2xl sm:text-3xl font-extrabold text-emerald-400">
-              {metrics.inStock}
+            <div className="text-2xl sm:text-3xl font-extrabold text-emerald-400 flex items-center gap-2">
+              <Check className="size-5 text-emerald-400" />
+              {metrics.publishedCount}
             </div>
-            <span className="text-xs text-emerald-400/80">Available now</span>
+            <span className="text-xs text-emerald-400/80">Published</span>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-[#383D47] border-white/10 text-white">
+          <CardHeader className="p-4 pb-2">
+            <CardTitle className="text-xs uppercase tracking-wider text-slate-400 font-semibold">
+              Drafts / Unpublished
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 pt-0 flex items-baseline justify-between">
+            <div className="text-2xl sm:text-3xl font-extrabold text-amber-400 flex items-center gap-2">
+              <EyeOff className="size-5 text-amber-400" />
+              {metrics.draftCount}
+            </div>
+            <span className="text-xs text-amber-400/80">Hidden</span>
           </CardContent>
         </Card>
 
@@ -253,25 +347,11 @@ export function EquipmentList() {
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4 pt-0 flex items-baseline justify-between">
-            <div className="text-2xl sm:text-3xl font-extrabold text-amber-400 flex items-center gap-2">
-              <Star className="size-5 fill-amber-400 text-amber-400" />
+            <div className="text-2xl sm:text-3xl font-extrabold text-amber-300 flex items-center gap-2">
+              <Star className="size-5 fill-amber-300 text-amber-300" />
               {metrics.featuredCount}
             </div>
             <span className="text-xs text-slate-400">On Home Carousel</span>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-[#383D47] border-white/10 text-white">
-          <CardHeader className="p-4 pb-2">
-            <CardTitle className="text-xs uppercase tracking-wider text-slate-400 font-semibold">
-              Total Inventory Value
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-4 pt-0 flex items-baseline justify-between">
-            <div className="text-2xl sm:text-3xl font-extrabold text-white">
-              ${Math.round(metrics.totalValue).toLocaleString()}
-            </div>
-            <span className="text-xs text-slate-400">AUD Direct Stock</span>
           </CardContent>
         </Card>
       </div>
@@ -282,7 +362,7 @@ export function EquipmentList() {
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-slate-400" />
             <input
               type="text"
-              placeholder="Search by equipment name, brand, SKU or specs..."
+              placeholder="Search by equipment name, brand, category, SKU..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full h-10 pl-9 pr-4 rounded-xl bg-black/25 border border-white/10 text-sm text-white placeholder:text-slate-400 focus:outline-hidden focus:border-[#ef0e0a]"
@@ -297,14 +377,30 @@ export function EquipmentList() {
             )}
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <select
+              value={filterPublish}
+              onChange={(e) => setFilterPublish(e.target.value as any)}
+              className="h-10 px-3 bg-black/25 text-white border border-white/10 rounded-xl text-xs font-medium cursor-pointer focus:outline-hidden focus:border-[#ef0e0a]"
+            >
+              <option value="all" className="bg-[#383D47] text-white">
+                All Statuses
+              </option>
+              <option value="published" className="bg-[#383D47] text-white">
+                Published Only (Live)
+              </option>
+              <option value="draft" className="bg-[#383D47] text-white">
+                Drafts Only (Unpublished)
+              </option>
+            </select>
+
             <select
               value={filterFeatured}
               onChange={(e) => setFilterFeatured(e.target.value as any)}
               className="h-10 px-3 bg-black/25 text-white border border-white/10 rounded-xl text-xs font-medium cursor-pointer focus:outline-hidden focus:border-[#ef0e0a]"
             >
               <option value="all" className="bg-[#383D47] text-white">
-                All Inventory
+                All Gear
               </option>
               <option value="featured" className="bg-[#383D47] text-white">
                 Featured on Home Only
@@ -349,8 +445,8 @@ export function EquipmentList() {
               className={cn(
                 "px-3 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer",
                 selectedCategory === cat
-                  ? "bg-[#ef0e0a] text-white shadow-xs"
-                  : "bg-black/20 text-slate-300 hover:text-white hover:bg-black/40 border border-white/5"
+                  ? "bg-[#ef0e0a] text-white"
+                  : "bg-black/20 text-slate-300 hover:bg-black/40 hover:text-white"
               )}
             >
               {cat}
@@ -360,180 +456,225 @@ export function EquipmentList() {
       </div>
 
       {isLoading ? (
-        <div className="w-full rounded-2xl bg-[#383D47] border border-white/10 p-5 flex flex-col gap-4">
-          <div className="flex items-center justify-between pb-3 border-b border-white/10">
-            <Skeleton className="h-4 w-32 bg-white/10" />
-            <Skeleton className="h-4 w-20 bg-white/10" />
-          </div>
-          {[1, 2, 3, 4, 5].map((idx) => (
-            <div key={idx} className="flex items-center justify-between gap-4 py-2 border-b border-white/5">
-              <div className="flex items-center gap-3">
-                <Skeleton className="size-12 rounded-xl bg-white/10" />
-                <div className="flex flex-col gap-2">
-                  <Skeleton className="h-4 w-48 bg-white/10" />
-                  <Skeleton className="h-3 w-28 bg-white/10" />
-                </div>
-              </div>
-              <Skeleton className="h-4 w-24 bg-white/10" />
-              <Skeleton className="h-4 w-20 bg-white/10" />
-              <Skeleton className="h-6 w-24 rounded-full bg-white/10" />
-              <div className="flex items-center gap-2">
-                <Skeleton className="size-8 rounded-lg bg-white/10" />
-                <Skeleton className="size-8 rounded-lg bg-white/10" />
-              </div>
-            </div>
+        <div className="flex flex-col gap-3">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <Skeleton key={i} className="h-16 w-full rounded-2xl bg-white/5" />
           ))}
         </div>
+      ) : filteredEquipment.length === 0 ? (
+        <Card className="bg-[#383D47] border-white/10 text-white p-12 text-center flex flex-col items-center justify-center gap-4">
+          <div className="size-16 rounded-full bg-white/5 flex items-center justify-center text-slate-400">
+            <Package className="size-8" />
+          </div>
+          <div className="flex flex-col gap-1">
+            <h3 className="text-lg font-bold text-white">No Equipment Found</h3>
+            <p className="text-sm text-slate-400 max-w-sm">
+              No equipment matching your filters or search term was found.
+            </p>
+          </div>
+          <Button
+            onClick={() => {
+              setSearchTerm("");
+              setSelectedCategory("All");
+              setFilterFeatured("all");
+              setFilterPublish("all");
+            }}
+            variant="outline"
+            className="border-white/15 text-white hover:bg-white/10 cursor-pointer text-xs mt-2"
+          >
+            Clear Filters
+          </Button>
+        </Card>
       ) : viewMode === "table" ? (
-        <div className="w-full rounded-2xl bg-[#383D47] border border-white/10 overflow-hidden shadow-sm">
+        <div className="bg-[#383D47] rounded-2xl border border-white/10 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-black/20 text-xs uppercase tracking-wider text-slate-400 border-b border-white/10 select-none">
+            <table className="w-full text-left text-sm text-slate-200">
+              <thead className="text-xs uppercase bg-black/30 text-slate-400 border-b border-white/10 select-none">
                 <tr>
-                  <th className="py-3 px-4 font-semibold">Equipment Product</th>
-                  <th className="py-3 px-4 font-semibold">Category</th>
-                  <th className="py-3 px-4 font-semibold">Price</th>
-                  <th className="py-3 px-4 font-semibold">Stock Status</th>
-                  <th className="py-3 px-4 font-semibold text-center">Home Page Slider</th>
-                  <th className="py-3 px-4 font-semibold text-right">Actions</th>
+                  <th scope="col" className="py-3.5 px-4 font-bold">
+                    Product
+                  </th>
+                  <th scope="col" className="py-3.5 px-4 font-bold">
+                    Category
+                  </th>
+                  <th scope="col" className="py-3.5 px-4 font-bold">
+                    Price
+                  </th>
+                  <th scope="col" className="py-3.5 px-4 font-bold">
+                    Stock Status
+                  </th>
+                  <th scope="col" className="py-3.5 px-4 font-bold text-center">
+                    Website Status
+                  </th>
+                  <th scope="col" className="py-3.5 px-4 font-bold text-center">
+                    Home Carousel
+                  </th>
+                  <th scope="col" className="py-3.5 px-4 font-bold text-right">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {filteredEquipment.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="py-12 text-center text-slate-400 font-medium">
-                      No equipment matches your current filters.
+                {filteredEquipment.map((item) => (
+                  <tr
+                    key={item.id}
+                    className="hover:bg-white/[0.03] transition-colors group"
+                  >
+                    <td className="py-3.5 px-4">
+                      <div className="flex items-center gap-3">
+                        <div className="relative size-12 rounded-xl bg-black/40 border border-white/10 p-1 flex items-center justify-center shrink-0 overflow-hidden">
+                          <Image
+                            src={item.image}
+                            alt={item.name}
+                            width={44}
+                            height={44}
+                            className="size-full object-contain"
+                          />
+                        </div>
+                        <div className="flex flex-col min-w-0">
+                          <span className="font-semibold text-white group-hover:text-orange-300 transition-colors truncate max-w-[200px] sm:max-w-xs">
+                            {item.name}
+                          </span>
+                          <div className="flex items-center gap-2 text-xs text-slate-400">
+                            <span className="text-[#ef0e0a] font-medium">{item.brand}</span>
+                            <span>•</span>
+                            <span className="font-mono text-[11px] text-slate-500">
+                              {item.sku || item.id}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
                     </td>
-                  </tr>
-                ) : (
-                  filteredEquipment.map((item) => (
-                    <tr
-                      key={item.id}
-                      className="hover:bg-white/[0.04] transition-colors group"
-                    >
-                      <td className="py-3.5 px-4">
-                        <div className="flex items-center gap-3">
-                          <div className="relative size-12 rounded-xl bg-black/40 border border-white/10 overflow-hidden shrink-0 flex items-center justify-center p-1">
-                            <Image
-                              src={item.image}
-                              alt={item.name}
-                              width={48}
-                              height={48}
-                              className="size-full object-contain"
-                            />
-                          </div>
-                          <div>
-                            <div className="font-semibold text-white group-hover:text-orange-300 transition-colors flex items-center gap-2">
-                              {item.name}
-                              {item.badge && (
-                                <span className={cn("text-[10px] px-2 py-0.5 rounded-full font-bold uppercase", item.badgeColor || "bg-white/10 text-white")}>
-                                  {item.badge}
-                                </span>
-                              )}
-                            </div>
-                            <div className="text-xs text-slate-400 flex items-center gap-2 mt-0.5">
-                              <span className="font-mono text-slate-400">{item.sku}</span>
-                              <span>•</span>
-                              <span className="text-[#ef0e0a] font-medium">{item.brand}</span>
-                            </div>
-                          </div>
-                        </div>
-                      </td>
 
-                      <td className="py-3.5 px-4 whitespace-nowrap">
-                        <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-white/10 text-white border border-white/15">
-                          {item.category}
-                        </span>
-                      </td>
+                    <td className="py-3.5 px-4 whitespace-nowrap">
+                      <span className="inline-flex px-2.5 py-1 rounded-md text-xs font-semibold bg-white/5 text-slate-300 border border-white/10">
+                        {item.category}
+                      </span>
+                    </td>
 
-                      <td className="py-3.5 px-4 whitespace-nowrap">
-                        <div className="font-bold text-white text-sm">
-                          {item.price}
-                        </div>
-                        {item.originalPrice && (
-                          <div className="text-xs text-slate-400 line-through">
-                            {item.originalPrice}
-                          </div>
+                    <td className="py-3.5 px-4 whitespace-nowrap font-bold text-white">
+                      {item.price}
+                    </td>
+
+                    <td className="py-3.5 px-4 whitespace-nowrap">
+                      <span
+                        className={cn(
+                          "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border",
+                          item.stockStatus === "In Stock (WA)"
+                            ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
+                            : item.stockStatus === "Low Stock"
+                            ? "bg-amber-500/15 text-amber-400 border-amber-500/30"
+                            : "bg-sky-500/15 text-sky-400 border-sky-500/30"
                         )}
-                      </td>
-
-                      <td className="py-3.5 px-4 whitespace-nowrap">
+                      >
                         <span
                           className={cn(
-                            "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold",
+                            "size-1.5 rounded-full",
                             item.stockStatus === "In Stock (WA)"
-                              ? "bg-emerald-500/15 text-emerald-300 border border-emerald-500/30"
+                              ? "bg-emerald-400"
                               : item.stockStatus === "Low Stock"
-                              ? "bg-amber-500/15 text-amber-300 border border-amber-500/30"
-                              : "bg-sky-500/15 text-sky-300 border border-sky-500/30"
+                              ? "bg-amber-400"
+                              : "bg-sky-400"
                           )}
-                        >
-                          <span
-                            className={cn(
-                              "size-1.5 rounded-full",
-                              item.stockStatus === "In Stock (WA)"
-                                ? "bg-emerald-400"
-                                : item.stockStatus === "Low Stock"
-                                ? "bg-amber-400"
-                                : "bg-sky-400"
-                            )}
-                          />
-                          {item.stockStatus}
-                        </span>
-                      </td>
+                        />
+                        {item.stockStatus}
+                      </span>
+                    </td>
 
-                      <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                    <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                      <button
+                        type="button"
+                        onClick={(e) => togglePublished(item.id, e)}
+                        className={cn(
+                          "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border transition-all cursor-pointer select-none",
+                          item.published
+                            ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40 hover:bg-emerald-500/30 shadow-xs"
+                            : "bg-amber-500/15 text-amber-300 border-amber-500/30 hover:bg-amber-500/25"
+                        )}
+                        title={
+                          item.published
+                            ? "Published live. Click to Unpublish (Move to Draft)"
+                            : "Draft / Unpublished. Click to Publish live on website"
+                        }
+                      >
+                        {item.published ? (
+                          <>
+                            <Check className="size-3.5 text-emerald-400" />
+                            <span>Published</span>
+                          </>
+                        ) : (
+                          <>
+                            <EyeOff className="size-3.5 text-amber-400" />
+                            <span>Draft</span>
+                          </>
+                        )}
+                      </button>
+                    </td>
+
+                    <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                      <button
+                        type="button"
+                        onClick={(e) => toggleFeatured(item.id, e)}
+                        className={cn(
+                          "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border transition-all cursor-pointer select-none",
+                          item.featuredOnHome
+                            ? "bg-amber-500/20 text-amber-300 border-amber-500/40 hover:bg-amber-500/30 shadow-xs"
+                            : "bg-white/5 text-slate-400 border-white/10 hover:bg-white/10 hover:text-slate-200"
+                        )}
+                        title={
+                          item.featuredOnHome
+                            ? "Featured on front slider. Click to hide from slider"
+                            : "Not on home slider. Click to feature"
+                        }
+                      >
+                        <Star
+                          className={cn(
+                            "size-3.5",
+                            item.featuredOnHome && "fill-amber-400 text-amber-400"
+                          )}
+                        />
+                        <span>{item.featuredOnHome ? "Featured" : "Hidden"}</span>
+                      </button>
+                    </td>
+
+                    <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                      <div className="flex items-center justify-end gap-1.5">
                         <button
                           type="button"
-                          onClick={(e) => toggleFeatured(item.id, e)}
-                          className={cn(
-                            "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border transition-all cursor-pointer select-none",
-                            item.featuredOnHome
-                              ? "bg-amber-500/20 text-amber-300 border-amber-500/40 hover:bg-amber-500/30 shadow-xs"
-                              : "bg-white/5 text-slate-400 border-white/10 hover:bg-white/10 hover:text-slate-200"
-                          )}
+                          onClick={() => setItemToView(item)}
+                          className="size-8 rounded-lg bg-white/5 hover:bg-white/15 flex items-center justify-center text-slate-300 hover:text-white transition-colors cursor-pointer"
+                          title="View Details"
                         >
-                          <Star
-                            className={cn(
-                              "size-3.5",
-                              item.featuredOnHome && "fill-amber-400 text-amber-400"
-                            )}
-                          />
-                          <span>{item.featuredOnHome ? "Featured" : "Hidden"}</span>
+                          <Eye className="size-4" />
                         </button>
-                      </td>
-
-                      <td className="py-3.5 px-4 text-right whitespace-nowrap">
-                        <div className="flex items-center justify-end gap-1.5">
-                          <button
-                            type="button"
-                            onClick={() => setItemToView(item)}
-                            className="size-8 rounded-lg bg-white/5 hover:bg-white/15 flex items-center justify-center text-slate-300 hover:text-white transition-colors cursor-pointer"
-                            title="View Details"
-                          >
-                            <Eye className="size-4" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setItemToEdit(item)}
-                            className="size-8 rounded-lg bg-white/5 hover:bg-white/15 flex items-center justify-center text-slate-300 hover:text-white transition-colors cursor-pointer"
-                            title="Edit Equipment"
-                          >
-                            <Edit className="size-4" />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => setItemToDelete(item)}
-                            className="size-8 rounded-lg bg-red-500/10 hover:bg-red-500/25 flex items-center justify-center text-red-400 hover:text-red-300 transition-colors cursor-pointer border border-red-500/20"
-                            title="Delete Equipment"
-                          >
-                            <Trash2 className="size-4" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
+                        <button
+                          type="button"
+                          onClick={() => setItemToEdit(item)}
+                          className="size-8 rounded-lg bg-white/5 hover:bg-white/15 flex items-center justify-center text-slate-300 hover:text-white transition-colors cursor-pointer"
+                          title="Edit Equipment"
+                        >
+                          <Edit className="size-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(e) => handleClone(item, e)}
+                          className="size-8 rounded-lg bg-sky-500/10 hover:bg-sky-500/20 flex items-center justify-center text-sky-400 hover:text-sky-300 transition-colors cursor-pointer border border-sky-500/20"
+                          title="Clone / Duplicate Listing for New Size"
+                        >
+                          <Copy className="size-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setItemToDelete(item)}
+                          className="size-8 rounded-lg bg-red-500/10 hover:bg-red-500/25 flex items-center justify-center text-red-400 hover:text-red-300 transition-colors cursor-pointer border border-red-500/20"
+                          title="Delete Equipment"
+                        >
+                          <Trash2 className="size-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
@@ -543,10 +684,29 @@ export function EquipmentList() {
           {filteredEquipment.map((item) => (
             <Card
               key={item.id}
-              className="bg-[#383D47] border-white/10 text-white overflow-hidden flex flex-col justify-between group hover:border-white/25 transition-all"
+              className="bg-[#383D47] border-white/10 text-white overflow-hidden flex flex-col justify-between group hover:border-white/20 transition-all duration-300"
             >
-              <div className="p-4 flex flex-col gap-3">
-                <div className="relative w-full h-44 rounded-xl bg-black/30 border border-white/10 overflow-hidden flex items-center justify-center p-3">
+              <div>
+                <div className="relative w-full h-48 bg-black/30 p-4 flex items-center justify-center border-b border-white/10">
+                  <span
+                    className={cn(
+                      "absolute top-3 left-3 z-10 rounded-full px-2.5 py-0.5 text-xs font-semibold flex items-center gap-1 border",
+                      item.published
+                        ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
+                        : "bg-amber-500/20 text-amber-300 border-amber-500/40"
+                    )}
+                  >
+                    {item.published ? (
+                      <>
+                        <Check className="size-3" /> Published
+                      </>
+                    ) : (
+                      <>
+                        <EyeOff className="size-3" /> Draft
+                      </>
+                    )}
+                  </span>
+
                   <Image
                     src={item.image}
                     alt={item.name}
@@ -554,19 +714,14 @@ export function EquipmentList() {
                     height={180}
                     className="size-full object-contain group-hover:scale-105 transition-transform duration-300"
                   />
-                  <div className="absolute top-2.5 right-2.5 flex items-center gap-1.5">
-                    {item.badge && (
-                      <span className={cn("text-[10px] px-2 py-0.5 rounded-full font-bold uppercase", item.badgeColor || "bg-white/10 text-white")}>
-                        {item.badge}
-                      </span>
-                    )}
-                  </div>
                 </div>
 
-                <div className="flex flex-col gap-1">
-                  <div className="flex items-center justify-between text-xs text-slate-400 font-mono">
-                    <span>{item.sku}</span>
-                    <span className="text-[#ef0e0a] font-semibold">{item.brand}</span>
+                <div className="p-4 flex flex-col gap-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs font-semibold text-[#ef0e0a]">{item.brand}</span>
+                    <span className="text-[11px] px-2 py-0.5 rounded-md bg-white/5 text-slate-300 border border-white/10">
+                      {item.category}
+                    </span>
                   </div>
                   <h3 className="text-base font-bold text-white group-hover:text-orange-300 transition-colors line-clamp-1">
                     {item.name}
@@ -586,6 +741,23 @@ export function EquipmentList() {
                 <div className="flex items-center gap-1.5">
                   <button
                     type="button"
+                    onClick={(e) => togglePublished(item.id, e)}
+                    className={cn(
+                      "p-1.5 rounded-lg border transition-all cursor-pointer",
+                      item.published
+                        ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
+                        : "bg-amber-500/20 text-amber-300 border-amber-500/40"
+                    )}
+                    title={item.published ? "Live. Click to unpublish" : "Draft. Click to publish"}
+                  >
+                    {item.published ? (
+                      <Check className="size-4 text-emerald-400" />
+                    ) : (
+                      <EyeOff className="size-4 text-amber-400" />
+                    )}
+                  </button>
+                  <button
+                    type="button"
                     onClick={(e) => toggleFeatured(item.id, e)}
                     className={cn(
                       "p-1.5 rounded-lg border transition-all cursor-pointer",
@@ -595,7 +767,20 @@ export function EquipmentList() {
                     )}
                     title={item.featuredOnHome ? "Featured on Home" : "Hide from Home"}
                   >
-                    <Star className={cn("size-4", item.featuredOnHome && "fill-amber-400 text-amber-400")} />
+                    <Star
+                      className={cn(
+                        "size-4",
+                        item.featuredOnHome && "fill-amber-400 text-amber-400"
+                      )}
+                    />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => handleClone(item, e)}
+                    className="p-1.5 rounded-lg bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 border border-sky-500/20 cursor-pointer"
+                    title="Clone listing for new size"
+                  >
+                    <Copy className="size-4" />
                   </button>
                   <button
                     type="button"
@@ -628,25 +813,22 @@ export function EquipmentList() {
           onClick={() => setItemToDelete(null)}
         >
           <div
-            className="w-full max-w-md bg-[#343943] border border-red-500/30 rounded-3xl p-6 sm:p-7 text-white shadow-2xl flex flex-col gap-5 animate-in zoom-in-95 duration-150"
+            className="w-full max-w-md bg-[#343943] border border-white/15 rounded-3xl p-6 sm:p-8 text-white shadow-2xl flex flex-col gap-6"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center gap-3.5">
-              <div className="size-12 rounded-2xl bg-red-500/20 border border-red-500/30 flex items-center justify-center text-red-400 shrink-0">
-                <AlertTriangle className="size-6" />
+            <div className="flex items-center gap-3.5 text-red-400">
+              <div className="size-12 rounded-2xl bg-red-500/15 border border-red-500/30 flex items-center justify-center shrink-0">
+                <AlertTriangle className="size-6 text-red-400" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">
-                  Delete Equipment Listing?
-                </h3>
-                <span className="text-xs text-red-300/80">
-                  Permanent action
-                </span>
+                <h3 className="text-lg font-bold text-white">Delete Equipment?</h3>
+                <p className="text-xs text-slate-400">This action cannot be undone.</p>
               </div>
             </div>
 
             <p className="text-sm text-slate-300 leading-relaxed">
-              Are you sure you want to delete <strong className="text-white">"{itemToDelete.name}"</strong>? This will remove this item from the Western Australia warehouse stock inventory and from the Home Page featured carousel.
+              Are you sure you want to permanently remove{" "}
+              <strong className="text-white">"{itemToDelete.name}"</strong> from your equipment catalog?
             </p>
 
             <div className="flex items-center justify-end gap-3 pt-3 border-t border-white/10">
@@ -691,9 +873,7 @@ export function EquipmentList() {
                   />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-white">
-                    {itemToView.name}
-                  </h3>
+                  <h3 className="text-xl font-bold text-white">{itemToView.name}</h3>
                   <div className="flex items-center gap-2 text-xs text-slate-400 mt-0.5">
                     <span className="text-[#ef0e0a] font-semibold">{itemToView.brand}</span>
                     <span>•</span>
@@ -713,15 +893,45 @@ export function EquipmentList() {
               </button>
             </div>
 
-            <div className="flex items-center gap-3">
-              <span className={cn(
-                "px-3 py-1 rounded-full text-xs font-semibold border flex items-center gap-1.5",
-                itemToView.featuredOnHome
-                  ? "bg-amber-500/20 text-amber-300 border-amber-500/40"
-                  : "bg-white/5 text-slate-400 border-white/10"
-              )}>
-                <Star className={cn("size-3.5", itemToView.featuredOnHome && "fill-amber-400 text-amber-400")} />
-                {itemToView.featuredOnHome ? "Displayed on Home Page Slider" : "Hidden from Home Slider"}
+            <div className="flex items-center gap-3 flex-wrap">
+              <span
+                className={cn(
+                  "px-3 py-1 rounded-full text-xs font-semibold border flex items-center gap-1.5",
+                  itemToView.published
+                    ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
+                    : "bg-amber-500/20 text-amber-300 border-amber-500/40"
+                )}
+              >
+                {itemToView.published ? (
+                  <>
+                    <Check className="size-3.5 text-emerald-400" />
+                    Published on Website
+                  </>
+                ) : (
+                  <>
+                    <EyeOff className="size-3.5 text-amber-400" />
+                    Draft (Unpublished)
+                  </>
+                )}
+              </span>
+
+              <span
+                className={cn(
+                  "px-3 py-1 rounded-full text-xs font-semibold border flex items-center gap-1.5",
+                  itemToView.featuredOnHome
+                    ? "bg-amber-500/20 text-amber-300 border-amber-500/40"
+                    : "bg-white/5 text-slate-400 border-white/10"
+                )}
+              >
+                <Star
+                  className={cn(
+                    "size-3.5",
+                    itemToView.featuredOnHome && "fill-amber-400 text-amber-400"
+                  )}
+                />
+                {itemToView.featuredOnHome
+                  ? "Displayed on Home Slider"
+                  : "Hidden from Home Slider"}
               </span>
 
               <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
@@ -746,22 +956,6 @@ export function EquipmentList() {
                 {itemToView.longDescription || itemToView.description}
               </div>
             </div>
-
-            {itemToView.detailedSpecs && itemToView.detailedSpecs.length > 0 && (
-              <div className="flex flex-col gap-2">
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                  Technical Specifications
-                </span>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {itemToView.detailedSpecs.map((spec, i) => (
-                    <div key={i} className="p-2.5 rounded-xl bg-black/20 border border-white/10 flex items-center justify-between text-xs">
-                      <span className="text-slate-400">{spec.label}</span>
-                      <span className="font-semibold text-white">{spec.value}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
 
             <div className="flex items-center justify-between pt-3 border-t border-white/10">
               <Button
@@ -792,11 +986,11 @@ export function EquipmentList() {
           onClick={() => setItemToEdit(null)}
         >
           <div
-            className="w-full max-w-xl bg-[#343943] border border-white/15 rounded-3xl p-6 sm:p-7 text-white shadow-2xl flex flex-col gap-5 max-h-[90vh] overflow-y-auto"
+            className="w-full max-w-2xl bg-[#343943] border border-white/15 rounded-3xl p-6 sm:p-8 text-white shadow-2xl flex flex-col gap-6 max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between border-b border-white/10 pb-3">
-              <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between border-b border-white/10 pb-4">
+              <div className="flex items-center gap-3">
                 <Edit className="size-5 text-[#ef0e0a]" />
                 <h3 className="text-xl font-bold text-white">Edit Equipment</h3>
               </div>
@@ -823,6 +1017,48 @@ export function EquipmentList() {
                   }
                   className="h-10 px-3.5 rounded-xl bg-black/30 border border-white/15 text-sm text-white focus:outline-hidden focus:border-[#ef0e0a]"
                 />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-300">
+                    Brand
+                  </label>
+                  <select
+                    value={itemToEdit.brand}
+                    onChange={(e) =>
+                      setItemToEdit({ ...itemToEdit, brand: e.target.value as any })
+                    }
+                    className="h-10 px-3.5 rounded-xl bg-black/30 border border-white/15 text-sm text-white focus:outline-hidden focus:border-[#ef0e0a] cursor-pointer"
+                  >
+                    {equipmentBrands.map((b) => (
+                      <option key={b} value={b} className="bg-[#343943]">
+                        {b}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-300">
+                    Category
+                  </label>
+                  <select
+                    value={itemToEdit.category}
+                    onChange={(e) =>
+                      setItemToEdit({ ...itemToEdit, category: e.target.value as any })
+                    }
+                    className="h-10 px-3.5 rounded-xl bg-black/30 border border-white/15 text-sm text-white focus:outline-hidden focus:border-[#ef0e0a] cursor-pointer"
+                  >
+                    {equipmentCategories
+                      .filter((c) => c !== "All")
+                      .map((c) => (
+                        <option key={c} value={c} className="bg-[#343943]">
+                          {c}
+                        </option>
+                      ))}
+                  </select>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -855,22 +1091,45 @@ export function EquipmentList() {
                     }
                     className="h-10 px-3.5 rounded-xl bg-black/30 border border-white/15 text-sm text-white focus:outline-hidden focus:border-[#ef0e0a] cursor-pointer"
                   >
-                    <option value="In Stock (WA)" className="bg-[#343943]">
-                      In Stock (WA)
-                    </option>
-                    <option value="Low Stock" className="bg-[#343943]">
-                      Low Stock
-                    </option>
-                    <option value="Demo Unit Available" className="bg-[#343943]">
-                      Demo Unit Available
-                    </option>
+                    {stockStatusOptions.map((opt) => (
+                      <option key={opt} value={opt} className="bg-[#343943]">
+                        {opt}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
 
+              <div className="p-4 rounded-2xl bg-black/30 border border-white/15 flex items-center justify-between gap-4">
+                <div className="flex flex-col gap-0.5">
+                  <div className="text-sm font-bold text-white flex items-center gap-1.5">
+                    <Check className="size-4 text-emerald-400" />
+                    Publish on Website
+                  </div>
+                  <div className="text-xs text-slate-400">
+                    When turned on, this product is visible live on the website. Turn off to keep as a private draft.
+                  </div>
+                </div>
+
+                <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                  <input
+                    type="checkbox"
+                    checked={itemToEdit.published}
+                    onChange={(e) =>
+                      setItemToEdit({
+                        ...itemToEdit,
+                        published: e.target.checked,
+                      })
+                    }
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                </label>
+              </div>
+
               <div className="flex flex-col gap-1.5">
                 <ImageUploader
-                  label="Product Photo (Drag & Drop to Vercel Blob)"
+                  label="Product Photo (Drag & Drop or Choose from Computer)"
                   value={itemToEdit.image}
                   onChange={(url) => setItemToEdit({ ...itemToEdit, image: url })}
                 />
@@ -911,7 +1170,7 @@ export function EquipmentList() {
                     Feature on Home Page Slider
                   </div>
                   <div className="text-xs text-slate-400">
-                    Enable to display this item directly in the front page featured equipment slider.
+                    Enable to display this item in the front page featured equipment slider (only if published).
                   </div>
                 </div>
 
@@ -954,4 +1213,3 @@ export function EquipmentList() {
     </div>
   );
 }
-

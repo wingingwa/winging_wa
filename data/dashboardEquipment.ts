@@ -2,6 +2,7 @@ import { staticInventory, StockItem } from "./stockInventory";
 
 export interface DashboardEquipmentItem extends StockItem {
   featuredOnHome: boolean;
+  published: boolean;
   createdAt?: string;
   sku?: string;
 }
@@ -19,6 +20,7 @@ export const initialDashboardEquipment: DashboardEquipmentItem[] =
   staticInventory.map((item, index) => ({
     ...item,
     featuredOnHome: homeFeaturedIds.has(item.id),
+    published: true,
     sku: `WA-${item.brand.startsWith("AFS") ? "AFS" : "MNT"}-${(100 + index).toString()}`,
     createdAt: "2026-10-24",
   }));
@@ -30,13 +32,18 @@ export const equipmentCategories = [
   "Masts & Fuselages",
   "Foil Assist",
   "Accessories",
+  "Boards",
 ] as const;
 
-export const equipmentBrands = ["AFS Foils", "Manta Foils"] as const;
+export const equipmentBrands = [
+  "AFS Foils",
+  "Manta Foils",
+  "Winging WA",
+  "Custom",
+] as const;
 
 export const stockStatusOptions = [
   "In Stock (WA)",
   "Low Stock",
   "Demo Unit Available",
 ] as const;
-

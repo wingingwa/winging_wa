@@ -25,6 +25,7 @@ export const equipment = pgTable("equipment", {
   image: text("image").notNull(),
   description: text("description"),
   featuredOnHome: boolean("featured_on_home").default(false).notNull(),
+  published: boolean("published").default(true).notNull(),
   sku: text("sku"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

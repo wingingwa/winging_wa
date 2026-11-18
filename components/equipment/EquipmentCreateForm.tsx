@@ -13,6 +13,7 @@ import {
   Sparkles,
   Layers,
   Upload,
+  EyeOff,
 } from "lucide-react";
 import {
   equipmentBrands,
@@ -52,6 +53,7 @@ export function EquipmentCreateForm() {
     specs: "High Modulus French Carbon • Advanced Profile",
     description: "",
     featuredOnHome: true,
+    published: true,
   });
 
   const [detailedSpecs, setDetailedSpecs] = useState<{ label: string; value: string }[]>([
@@ -107,26 +109,39 @@ export function EquipmentCreateForm() {
     setInTheBox((prev) => prev.map((item, i) => (i === index ? text : item)));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSave = async (publishStatus: boolean) => {
+    if (!formData.name.trim() || !formData.price.trim()) {
+      alert("Please provide at least a Product Name and Price.");
+      return;
+    }
+
     setIsSubmitting(true);
+    const resolvedId =
+      formData.id ||
+      formData.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)+/g, "");
 
     try {
       await fetch("/api/equipment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          id: formData.id,
+          id: resolvedId,
           name: formData.name,
           brand: formData.brand,
           category: formData.category,
           price: formData.price,
           stockStatus: formData.stockStatus,
           image: formData.image,
+          specs: formData.specs,
           description: formData.description,
           featuredOnHome: formData.featuredOnHome,
+          published: publishStatus,
         }),
       });
+      setFormData((prev) => ({ ...prev, id: resolvedId, published: publishStatus }));
       setIsCreated(true);
     } catch (err) {
       console.error(err);
@@ -136,22 +151,49 @@ export function EquipmentCreateForm() {
     }
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleSave(formData.published);
+  };
+
   if (isCreated) {
     return (
       <div className="flex flex-col items-center justify-center py-16 px-4 text-center max-w-xl mx-auto gap-6 bg-[#383D47] rounded-3xl border border-white/10 p-8 shadow-2xl">
-        <div className="size-16 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center">
-          <CheckCircle2 className="size-9" />
+        <div
+          className={cn(
+            "size-16 rounded-full flex items-center justify-center border",
+            formData.published
+              ? "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
+              : "bg-amber-500/20 text-amber-400 border-amber-500/30"
+          )}
+        >
+          {formData.published ? (
+            <CheckCircle2 className="size-9" />
+          ) : (
+            <EyeOff className="size-9" />
+          )}
         </div>
 
         <div className="flex flex-col gap-2">
           <h2 className="text-2xl sm:text-3xl font-bold text-white">
-            Equipment Listed Successfully!
+            {formData.published
+              ? "Equipment Published Successfully!"
+              : "Equipment Saved as Draft!"}
           </h2>
           <p className="text-sm text-slate-300">
-            <strong>"{formData.name}"</strong> has been added to the inventory catalog.
-            {formData.featuredOnHome && (
+            <strong>"{formData.name}"</strong> has been saved to your equipment inventory catalog.
+            {formData.published ? (
+              <span className="block text-emerald-300 font-semibold mt-1">
+                ✓ This item is now live and visible to website visitors.
+              </span>
+            ) : (
               <span className="block text-amber-300 font-semibold mt-1">
-                ★ This item is now configured to appear on the Home Page featured slider.
+                🔒 This item is an unpublished draft and is hidden from public website visitors.
+              </span>
+            )}
+            {formData.featuredOnHome && formData.published && (
+              <span className="block text-amber-300 font-semibold mt-1">
+                ★ This item is also configured to appear in the Home Page featured slider.
               </span>
             )}
           </p>
@@ -182,6 +224,7 @@ export function EquipmentCreateForm() {
                 specs: "High Modulus French Carbon • Advanced Profile",
                 description: "",
                 featuredOnHome: true,
+                published: true,
               });
             }}
             className="px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white font-semibold text-sm border border-white/15 transition-colors cursor-pointer"
@@ -206,7 +249,7 @@ export function EquipmentCreateForm() {
           <div>
             <h1 className="text-2xl font-bold text-white">Create New Equipment Listing</h1>
             <p className="text-xs text-slate-300">
-              Add genuine AFS Foils or Manta Foil Assist equipment to the WA inventory.
+              Add genuine AFS Foils, Manta Foil Assist, or custom equipment to the WA inventory.
             </p>
           </div>
         </div>
@@ -307,23 +350,20 @@ export function EquipmentCreateForm() {
                 <select
                   value={formData.stockStatus}
                   onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      stockStatus: e.target.value as any,
-                    })
+                    setFormData({ ...formData, stockStatus: e.target.value as any })
                   }
                   className="h-10 px-3.5 rounded-xl bg-black/30 border border-white/15 text-sm text-white focus:outline-hidden focus:border-[#ef0e0a] cursor-pointer"
                 >
-                  {stockStatusOptions.map((s) => (
-                    <option key={s} value={s} className="bg-[#343943]">
-                      {s}
+                  {stockStatusOptions.map((opt) => (
+                    <option key={opt} value={opt} className="bg-[#343943]">
+                      {opt}
                     </option>
                   ))}
                 </select>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-bold uppercase tracking-wider text-slate-300">
                   Retail Price (AUD) <span className="text-[#ef0e0a]">*</span>
@@ -342,26 +382,11 @@ export function EquipmentCreateForm() {
 
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-bold uppercase tracking-wider text-slate-300">
-                  Original Price (Strikethrough)
+                  Badge / Tag Label
                 </label>
                 <input
                   type="text"
-                  placeholder="Optional: $2,800.00"
-                  value={formData.originalPrice}
-                  onChange={(e) =>
-                    setFormData({ ...formData, originalPrice: e.target.value })
-                  }
-                  className="h-10 px-3.5 rounded-xl bg-black/30 border border-white/15 text-sm text-white placeholder:text-slate-500 focus:outline-hidden focus:border-[#ef0e0a]"
-                />
-              </div>
-
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-300">
-                  Badge Label
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. Sale / Hot / French Carbon"
+                  placeholder="e.g. Sale, New Release, French Carbon"
                   value={formData.badge}
                   onChange={(e) =>
                     setFormData({ ...formData, badge: e.target.value })
@@ -373,10 +398,65 @@ export function EquipmentCreateForm() {
           </CardContent>
         </Card>
 
-        <Card className="bg-[#383D47] border-amber-500/30 text-white ring-1 ring-amber-500/20">
-          <CardContent className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+        <Card className="bg-[#383D47] border-white/10 text-white">
+          <CardContent className="p-6 flex items-center justify-between gap-4">
             <div className="flex items-start gap-3.5">
-              <div className="size-11 rounded-2xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0 mt-0.5">
+              <div
+                className={cn(
+                  "size-10 rounded-xl flex items-center justify-center shrink-0 border",
+                  formData.published
+                    ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
+                    : "bg-amber-500/15 text-amber-400 border-amber-500/30"
+                )}
+              >
+                {formData.published ? (
+                  <CheckCircle2 className="size-5" />
+                ) : (
+                  <EyeOff className="size-5" />
+                )}
+              </div>
+              <div className="flex flex-col gap-1">
+                <div className="text-base font-bold text-white flex items-center gap-2">
+                  {formData.published
+                    ? "Live Publication (Published)"
+                    : "Draft Mode (Unpublished)"}
+                  <span
+                    className={cn(
+                      "text-[11px] font-semibold px-2 py-0.5 rounded-full border",
+                      formData.published
+                        ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
+                        : "bg-amber-500/20 text-amber-300 border-amber-500/30"
+                    )}
+                  >
+                    {formData.published ? "Visible on Store" : "Hidden from Visitors"}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  {formData.published
+                    ? "This listing will be immediately visible to public website visitors once created."
+                    : "This listing will be saved as an internal draft in your admin catalog, completely hidden from the public website until you publish it."}
+                </p>
+              </div>
+            </div>
+
+            <label className="relative inline-flex items-center cursor-pointer shrink-0">
+              <input
+                type="checkbox"
+                checked={formData.published}
+                onChange={(e) =>
+                  setFormData({ ...formData, published: e.target.checked })
+                }
+                className="sr-only peer"
+              />
+              <div className="w-14 h-7 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-emerald-500"></div>
+            </label>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-[#383D47] border-white/10 text-white">
+          <CardContent className="p-6 flex items-center justify-between gap-4">
+            <div className="flex items-start gap-3.5">
+              <div className="size-10 rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center justify-center shrink-0">
                 <Star className="size-5 fill-amber-400" />
               </div>
               <div className="flex flex-col gap-1">
@@ -387,7 +467,7 @@ export function EquipmentCreateForm() {
                   </span>
                 </div>
                 <p className="text-xs text-slate-300 leading-relaxed">
-                  When enabled, this equipment appears directly in the front page interactive equipment carousel on <strong className="text-white">wingingwa.com.au</strong> so visitors can immediately see and enquire about it.
+                  When enabled (and published), this equipment appears directly in the front page interactive equipment carousel on <strong className="text-white">wingingwa.com.au</strong> so visitors can immediately see and enquire about it.
                 </p>
               </div>
             </div>
@@ -414,7 +494,7 @@ export function EquipmentCreateForm() {
             </h2>
 
             <ImageUploader
-              label="Product Photo (Drag & Drop to Vercel Blob)"
+              label="Product Photo (Drag & Drop or Select from Computer)"
               value={formData.image}
               onChange={(url) => setFormData({ ...formData, image: url })}
             />
@@ -554,7 +634,7 @@ export function EquipmentCreateForm() {
           </CardContent>
         </Card>
 
-        <div className="flex items-center justify-end gap-3 pb-8">
+        <div className="flex items-center justify-end gap-3 pb-8 flex-wrap">
           <Link
             href="/dashboard/equipment"
             className="px-5 py-2.5 rounded-xl border border-white/15 bg-white/5 hover:bg-white/10 text-white font-medium text-sm transition-colors"
@@ -562,15 +642,23 @@ export function EquipmentCreateForm() {
             Cancel
           </Link>
           <Button
+            type="button"
+            disabled={isSubmitting}
+            onClick={() => handleSave(false)}
+            variant="outline"
+            className="px-5 py-2.5 rounded-xl border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 font-semibold text-sm transition-colors cursor-pointer"
+          >
+            Save as Draft (Unpublished)
+          </Button>
+          <Button
             type="submit"
             disabled={isSubmitting}
             className="px-6 py-2.5 rounded-xl bg-[#ef0e0a] hover:bg-[#c40c08] text-white font-semibold text-sm transition-colors cursor-pointer shadow-sm"
           >
-            {isSubmitting ? "Saving Equipment..." : "Create Equipment Listing"}
+            {isSubmitting ? "Saving..." : "Publish to Website"}
           </Button>
         </div>
       </form>
     </div>
   );
 }
-
