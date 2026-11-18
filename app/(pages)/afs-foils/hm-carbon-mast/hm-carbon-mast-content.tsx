@@ -68,20 +68,10 @@ export default function ProductContentView() {
         const nextIdx = (currentSlide - 1 + galleryImages.length) % galleryImages.length;
         updateGallery(nextIdx);
       };
-      prevBtn.onpointerdown = (e) => {
-        e.preventDefault();
-        const nextIdx = (currentSlide - 1 + galleryImages.length) % galleryImages.length;
-        updateGallery(nextIdx);
-      };
     }
 
     if (nextBtn) {
       nextBtn.onclick = (e) => {
-        e.preventDefault();
-        const nextIdx = (currentSlide + 1) % galleryImages.length;
-        updateGallery(nextIdx);
-      };
-      nextBtn.onpointerdown = (e) => {
         e.preventDefault();
         const nextIdx = (currentSlide + 1) % galleryImages.length;
         updateGallery(nextIdx);
