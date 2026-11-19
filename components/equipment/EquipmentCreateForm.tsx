@@ -60,7 +60,7 @@ export function EquipmentCreateForm() {
     setFormData((prev) => ({
       ...prev,
       name,
-      id: prev.id ? prev.id : slug,
+      id: slug,
     }));
   };
 
@@ -140,7 +140,7 @@ export function EquipmentCreateForm() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    handleSave(formData.published);
+    handleSave(true);
   };
 
   if (isCreated) {

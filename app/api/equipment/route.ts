@@ -25,7 +25,7 @@ export async function GET(req: Request) {
       }
     } else {
       if (featuredOnly) {
-        records = await db
+        const featuredRecords = await db
           .select()
           .from(equipment)
           .where(
@@ -35,6 +35,19 @@ export async function GET(req: Request) {
             )
           )
           .orderBy(desc(equipment.createdAt));
+
+        const otherPublished = await db
+          .select()
+          .from(equipment)
+          .where(
+            and(
+              eq(equipment.featuredOnHome, false),
+              eq(equipment.published, true)
+            )
+          )
+          .orderBy(desc(equipment.createdAt));
+
+        records = [...featuredRecords, ...otherPublished];
       } else {
         records = await db
           .select()

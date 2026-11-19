@@ -168,13 +168,27 @@ export function EquipmentList() {
       })
     );
     try {
-      await fetch("/api/equipment", {
+      const res = await fetch("/api/equipment", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, published: nextValue }),
       });
+      const data = await res.json();
+      if (!data.success) {
+        setEquipment((prev) =>
+          prev.map((item) =>
+            item.id === id ? { ...item, published: !nextValue } : item
+          )
+        );
+        showToast("Error updating publish status");
+      }
     } catch (err) {
       console.error(err);
+      setEquipment((prev) =>
+        prev.map((item) =>
+          item.id === id ? { ...item, published: !nextValue } : item
+        )
+      );
     }
   };
 
@@ -217,7 +231,11 @@ export function EquipmentList() {
     e.preventDefault();
     if (!itemToEdit) return;
 
-    const payload = itemToEdit;
+    const payload = {
+      ...itemToEdit,
+      brand: itemToEdit.brand || "AFS Foils",
+      published: itemToEdit.published !== undefined ? Boolean(itemToEdit.published) : true,
+    };
     setEquipment((prev) =>
       prev.map((item) => (item.id === payload.id ? payload : item))
     );
@@ -1026,25 +1044,6 @@ export function EquipmentList() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-bold uppercase tracking-wider text-slate-300">
-                    Brand
-                  </label>
-                  <select
-                    value={itemToEdit.brand}
-                    onChange={(e) =>
-                      setItemToEdit({ ...itemToEdit, brand: e.target.value as any })
-                    }
-                    className="h-10 px-3.5 rounded-xl bg-black/30 border border-white/15 text-sm text-white focus:outline-hidden focus:border-[#ef0e0a] cursor-pointer"
-                  >
-                    {equipmentBrands.map((b) => (
-                      <option key={b} value={b} className="bg-[#343943]">
-                        {b}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold uppercase tracking-wider text-slate-300">
                     Category
                   </label>
                   <select
@@ -1062,23 +1061,6 @@ export function EquipmentList() {
                         </option>
                       ))}
                   </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-bold uppercase tracking-wider text-slate-300">
-                    Price (AUD)
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={itemToEdit.price}
-                    onChange={(e) =>
-                      setItemToEdit({ ...itemToEdit, price: e.target.value })
-                    }
-                    className="h-10 px-3.5 rounded-xl bg-black/30 border border-white/15 text-sm text-white focus:outline-hidden focus:border-[#ef0e0a]"
-                  />
                 </div>
 
                 <div className="flex flex-col gap-1.5">
@@ -1102,6 +1084,21 @@ export function EquipmentList() {
                     ))}
                   </select>
                 </div>
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-xs font-bold uppercase tracking-wider text-slate-300">
+                  Price (AUD)
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={itemToEdit.price}
+                  onChange={(e) =>
+                    setItemToEdit({ ...itemToEdit, price: e.target.value })
+                  }
+                  className="h-10 px-3.5 rounded-xl bg-black/30 border border-white/15 text-sm text-white focus:outline-hidden focus:border-[#ef0e0a]"
+                />
               </div>
 
               <div className="p-4 rounded-2xl bg-black/30 border border-white/15 flex items-center justify-between gap-4">

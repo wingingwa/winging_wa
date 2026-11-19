@@ -139,7 +139,7 @@ const WAStockSection = () => {
           {mounted ? (
             <Swiper
               modules={[Navigation, Autoplay]}
-              loop={true}
+              loop={products.length > 4}
               speed={800}
               autoplay={{
                 delay: 3500,
