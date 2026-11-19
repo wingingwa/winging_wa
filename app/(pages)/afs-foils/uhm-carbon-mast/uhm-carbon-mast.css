@@ -113,3 +113,49 @@
     gap: 2rem !important;
   }
 }
+
+.uhm-carbon-mast-page .choose {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  align-items: center !important;
+  gap: clamp(2rem, 4vw, 5rem) !important;
+  max-width: 1600px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding-left: clamp(1.25rem, 5vw, 4rem) !important;
+  padding-right: clamp(1.25rem, 5vw, 4rem) !important;
+}
+.uhm-carbon-mast-page .choose .choose_img_box {
+  order: 1 !important;
+  width: 100% !important;
+  max-width: 550px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: center !important;
+  position: relative !important;
+}
+.uhm-carbon-mast-page .choose .choose_content {
+  order: 2 !important;
+  width: 100% !important;
+  max-width: 520px !important;
+  margin-left: 0 !important;
+  margin-right: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  z-index: 10 !important;
+}
+@media (max-width: 860px) {
+  .uhm-carbon-mast-page .choose {
+    grid-template-columns: 1fr !important;
+    gap: 2.5rem !important;
+  }
+  .uhm-carbon-mast-page .choose .choose_content {
+    order: 1 !important;
+  }
+  .uhm-carbon-mast-page .choose .choose_img_box {
+    order: 2 !important;
+  }
+}
