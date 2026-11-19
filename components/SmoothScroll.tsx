@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import { usePathname } from "next/navigation";
 import Lenis from "lenis";
 import "lenis/dist/lenis.css";
 
@@ -10,10 +9,8 @@ export default function SmoothScroll({
 }: {
   children: React.ReactNode;
 }) {
-  const pathname = usePathname();
-
   useEffect(() => {
-    if (pathname?.startsWith("/dashboard")) {
+    if (typeof window !== "undefined" && window.location.pathname.startsWith("/dashboard")) {
       return;
     }
 
@@ -25,7 +22,7 @@ export default function SmoothScroll({
     return () => {
       lenis.destroy();
     };
-  }, [pathname]);
+  }, []);
 
   return <>{children}</>;
 }

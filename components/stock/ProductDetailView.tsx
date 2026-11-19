@@ -121,7 +121,7 @@ export const ProductDetailView = ({
                   {product.stockStatus}
                 </span>
 
-                {product.disciplines.map((disc) => (
+                {(product.disciplines || []).map((disc) => (
                   <span
                     key={disc}
                     className="rounded-full bg-white/10 border border-white/10 px-2.5 py-0.5 text-[11px] font-medium text-slate-200"
