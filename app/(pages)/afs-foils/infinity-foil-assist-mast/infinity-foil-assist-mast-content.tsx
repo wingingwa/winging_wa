@@ -77,30 +77,6 @@ export default function ProductContentView() {
       }
     }
 
-    const toggle = root.querySelector("#infinity-mast-toggle");
-    if (toggle) {
-      const btnManta = root.querySelector<HTMLButtonElement>("#btn-tab-manta");
-      const btnFoilDrive = root.querySelector<HTMLButtonElement>("#btn-tab-foildrive");
-      const panelManta = root.querySelector<HTMLDivElement>("#infinity-panel-manta");
-      const panelFoilDrive = root.querySelector<HTMLDivElement>("#infinity-panel-foildrive");
-
-      if (btnManta && btnFoilDrive && panelManta && panelFoilDrive) {
-        btnManta.onclick = () => {
-          btnManta.className = "px-4 py-1.5 text-xs font-bold rounded-md transition-all bg-[#ef0e0a] text-white";
-          btnFoilDrive.className = "px-4 py-1.5 text-xs font-bold rounded-md transition-all text-[#888] hover:text-white";
-          panelManta.classList.remove("hidden");
-          panelFoilDrive.classList.add("hidden");
-        };
-
-        btnFoilDrive.onclick = () => {
-          btnFoilDrive.className = "px-4 py-1.5 text-xs font-bold rounded-md transition-all bg-[#ef0e0a] text-white";
-          btnManta.className = "px-4 py-1.5 text-xs font-bold rounded-md transition-all text-[#888] hover:text-white";
-          panelFoilDrive.classList.remove("hidden");
-          panelManta.classList.add("hidden");
-        };
-      }
-    }
-
     const initBoardSelectors = () => {
       const sections = root.querySelectorAll<HTMLElement>(".board-selector-root");
       sections.forEach((section) => {

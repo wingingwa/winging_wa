@@ -87,7 +87,7 @@ export default function ProductContentView() {
       };
     });
 
-    const contactButtons = root.querySelectorAll<HTMLElement>(".btn-contact-action");
+    const contactButtons = root.querySelectorAll<HTMLButtonElement>("button.btn-contact-action");
     contactButtons.forEach((btn) => {
       btn.onclick = (e) => {
         e.preventDefault();

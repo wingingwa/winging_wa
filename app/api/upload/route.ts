@@ -7,7 +7,17 @@ export async function POST(request: Request) {
     const file = formData.get("file") as File | null;
 
     if (!file) {
-      return NextResponse.json({ error: "No file provided" }, { status: 400 });
+      return NextResponse.json(
+        { error: "No file was selected. Please choose an image file to upload." },
+        { status: 400 }
+      );
+    }
+
+    if (file.size > 4.5 * 1024 * 1024) {
+      return NextResponse.json(
+        { error: "This image file is too large (over 4.5 MB). Please choose a smaller image." },
+        { status: 413 }
+      );
     }
 
     const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
@@ -24,10 +34,10 @@ export async function POST(request: Request) {
       contentType: blob.contentType,
     });
   } catch (error) {
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to upload file to Vercel Blob" },
-      { status: 500 }
-    );
+    const message =
+      error instanceof Error && error.message
+        ? error.message
+        : "Failed to upload image. Please try again.";
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
-
