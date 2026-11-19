@@ -355,7 +355,7 @@ export const ProductDetailView = ({
                   <div className="relative w-full h-56 rounded-2xl bg-[#ECECEC] p-6 flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:shadow-xl group-hover:shadow-white/5">
                     {item.badge && (
                       <span
-                        className={`absolute top-3 left-3 z-10 rounded-full px-2.5 py-1 text-[11px] font-bold tracking-wider uppercase shadow-md ${getEquipmentBadgeClass(item.badge)}`}
+                        className={`hidden absolute top-3 left-3 z-10 rounded-full px-2.5 py-1 text-[11px] font-bold tracking-wider uppercase shadow-md ${getEquipmentBadgeClass(item.badge)}`}
                       >
                         {item.badge}
                       </span>
