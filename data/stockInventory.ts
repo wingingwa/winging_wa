@@ -557,3 +557,21 @@ export const getStockItemById = (id: string): StockItem | undefined => {
       (id === "afs-silk-v2" && item.id === "afs-silk-v2-carbon")
   );
 };
+
+export const getEquipmentBadgeClass = (badge?: string): string => {
+  if (!badge) return "bg-black/85 text-white";
+  const b = badge.toLowerCase();
+  if (b.includes("sale") || b.includes("hot") || b.includes("new") || b.includes("demo")) {
+    return "bg-[#ef0e0a] text-white";
+  }
+  if (b.includes("stock")) {
+    return "bg-emerald-600 text-white";
+  }
+  if (b.includes("afs") || b.includes("carbon")) {
+    return "bg-black/85 text-white";
+  }
+  if (b.includes("manta") || b.includes("featured") || b.includes("kit")) {
+    return "bg-sky-600 text-white";
+  }
+  return "bg-black/85 text-white";
+};

@@ -7,6 +7,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Navigation } from "swiper/modules";
 import { ArrowRight, ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { getEquipmentBadgeClass } from "@/data/stockInventory";
 
 import "swiper/css";
 import "swiper/css/navigation";
@@ -176,7 +177,7 @@ const WAStockSection = () => {
                     <div className="relative w-full h-64 sm:h-72 rounded-2xl bg-[#ECECEC] p-6 flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:shadow-xl group-hover:shadow-white/5">
                       {product.badge && (
                         <span
-                          className={`absolute top-3.5 left-3.5 z-10 rounded-full px-2.5 py-0.5 text-xs font-semibold ${product.badgeColor}`}
+                          className={`absolute top-3.5 left-3.5 z-10 rounded-full px-3 py-1 text-[11px] font-bold tracking-wider uppercase shadow-md ${getEquipmentBadgeClass(product.badge)}`}
                         >
                           {product.badge}
                         </span>

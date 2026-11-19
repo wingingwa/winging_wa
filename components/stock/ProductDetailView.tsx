@@ -14,7 +14,7 @@ import {
   Phone,
   Plus,
 } from "lucide-react";
-import type { StockItem } from "@/data/stockInventory";
+import { StockItem, getEquipmentBadgeClass } from "@/data/stockInventory";
 
 interface ProductDetailViewProps {
   product: StockItem;
@@ -89,9 +89,7 @@ export const ProductDetailView = ({
               <div className="absolute top-5 left-5 z-10 flex flex-wrap gap-2">
                 {product.badge && (
                   <span
-                    className={`rounded-full px-3 py-1 text-xs font-bold tracking-wide uppercase shadow-xs ${
-                      product.badgeColor || "bg-emerald-500/20 text-emerald-700"
-                    }`}
+                    className={`rounded-full px-3 py-1 text-xs font-bold tracking-wide uppercase shadow-md ${getEquipmentBadgeClass(product.badge)}`}
                   >
                     {product.badge}
                   </span>
@@ -357,7 +355,7 @@ export const ProductDetailView = ({
                   <div className="relative w-full h-56 rounded-2xl bg-[#ECECEC] p-6 flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:shadow-xl group-hover:shadow-white/5">
                     {item.badge && (
                       <span
-                        className={`absolute top-3 left-3 z-10 rounded-full px-2.5 py-0.5 text-xs font-semibold ${item.badgeColor}`}
+                        className={`absolute top-3 left-3 z-10 rounded-full px-2.5 py-1 text-[11px] font-bold tracking-wider uppercase shadow-md ${getEquipmentBadgeClass(item.badge)}`}
                       >
                         {item.badge}
                       </span>
