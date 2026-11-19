@@ -6,22 +6,30 @@ export async function POST(request: Request) {
   try {
     const { email, password } = await request.json();
 
-    const expectedEmail = process.env.ADMIN_EMAIL || "admin@wingingwa.com.au";
+    const envEmail = process.env.ADMIN_EMAIL || "admin@wingingwa.com.au";
+    const allowedEmails = Array.from(
+      new Set([
+        "admin@wingingwa.com.au",
+        "wingingwa@gmail.com",
+        ...envEmail.split(",").map((e) => e.trim().toLowerCase()),
+      ])
+    ).filter(Boolean);
+
     const expectedPassword = process.env.ADMIN_PASSWORD || "wi12345678";
 
-    if (
-      !email ||
-      !password ||
-      email.trim().toLowerCase() !== expectedEmail.trim().toLowerCase() ||
-      password !== expectedPassword
-    ) {
+    const normalizedEmail = (email || "").trim().toLowerCase();
+    const isEmailValid = allowedEmails.includes(normalizedEmail);
+    const isPasswordValid =
+      password === expectedPassword || (password && password.trim() === expectedPassword);
+
+    if (!isEmailValid || !isPasswordValid) {
       return NextResponse.json(
         { error: "Invalid email or password" },
         { status: 401 }
       );
     }
 
-    const token = await signAdminToken(expectedEmail);
+    const token = await signAdminToken(normalizedEmail);
 
     const cookieStore = await cookies();
     cookieStore.set("admin_token", token, {
@@ -35,15 +43,14 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       user: {
-        email: expectedEmail,
+        email: normalizedEmail,
         role: "admin",
       },
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to authenticate" },
       { status: 500 }
     );
   }
 }
-
