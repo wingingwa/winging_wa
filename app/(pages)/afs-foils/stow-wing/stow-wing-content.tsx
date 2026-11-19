@@ -4,6 +4,59 @@ import { useEffect, useRef } from "react";
 import "./stow-wing.css";
 import { pageHtml } from "./stow-wing-html";
 
+interface StowSizeSpec {
+  surface: string;
+  aspectRatio: string;
+  barLength: string;
+  weight: string;
+  lineMaterials: string;
+  canopyMaterials: string;
+  windRange: string;
+  width: string;
+  alt: string;
+}
+
+const STOW_SIZES: Record<number, StowSizeSpec> = {
+  0: {
+    surface: "2.5 m²",
+    aspectRatio: "2.72",
+    barLength: "33.5 cm",
+    weight: "0.480 kg",
+    lineMaterials: "HMPE sleeved 1.1 & 0.9 mm · Dyneema SK76 1.6 mm",
+    canopyMaterials: "Techfiber STA15",
+    windRange: "25 to 40 knots",
+    width: "72%",
+    alt: "AFS STOW parawing, 2.5 m²",
+  },
+  1: {
+    surface: "3.5 m²",
+    aspectRatio: "2.72",
+    barLength: "33.5 cm",
+    weight: "0.570 kg",
+    lineMaterials: "HMPE sleeved 1.1 & 0.9 mm · Dyneema SK76 1.6 mm",
+    canopyMaterials: "Techfiber STA15",
+    windRange: "15 to 30 knots",
+    width: "82%",
+    alt: "AFS STOW parawing, 3.5 m²",
+  },
+  2: {
+    surface: "4.5 m²",
+    aspectRatio: "2.72",
+    barLength: "33.5 cm",
+    weight: "0.640 kg",
+    lineMaterials: "HMPE sleeved 1.1 & 0.9 mm · Dyneema SK76 1.6 mm",
+    canopyMaterials: "Techfiber STA15",
+    windRange: "12 to 25 knots",
+    width: "92%",
+    alt: "AFS STOW parawing, 4.5 m²",
+  },
+};
+
+const activeBtnClass =
+  "cursor-pointer px-[18px] py-[12px] text-[13px] font-bold tracking-[0.08em] transition-colors border border-white bg-white text-black";
+const inactiveBtnClass =
+  "cursor-pointer px-[18px] py-[12px] text-[13px] font-bold tracking-[0.08em] transition-colors border border-[#2a2a2a] bg-transparent text-white hover:border-white/50";
+
 export default function ProductContentView() {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -55,28 +108,52 @@ export default function ProductContentView() {
         activateTab(0);
       }
     }
-const toggle = root.querySelector("#infinity-mast-toggle");
-    if (toggle) {
-      const btnManta = root.querySelector<HTMLButtonElement>("#btn-tab-manta");
-      const btnFoilDrive = root.querySelector<HTMLButtonElement>("#btn-tab-foildrive");
-      const panelManta = root.querySelector<HTMLDivElement>("#infinity-panel-manta");
-      const panelFoilDrive = root.querySelector<HTMLDivElement>("#infinity-panel-foildrive");
 
-      if (btnManta && btnFoilDrive && panelManta && panelFoilDrive) {
-        btnManta.onclick = () => {
-          btnManta.className = "px-4 py-1.5 text-xs font-bold rounded-md transition-all bg-[#ef0e0a] text-white";
-          btnFoilDrive.className = "px-4 py-1.5 text-xs font-bold rounded-md transition-all text-[#888] hover:text-white";
-          panelManta.classList.remove("hidden");
-          panelFoilDrive.classList.add("hidden");
-        };
+    const sizeSection = root.querySelector<HTMLElement>("#tailles");
+    if (sizeSection) {
+      const sizeButtons = sizeSection.querySelectorAll<HTMLButtonElement>(
+        ".mt-\\[30px\\].flex.gap-2 button"
+      );
+      const specSpans = sizeSection.querySelectorAll<HTMLElement>(
+        ".border-t.border-white\\/28 .text-right"
+      );
+      const wingImage = sizeSection.querySelector<HTMLImageElement>(
+        "img[alt*='STOW'], .transition-\\[width\\]"
+      );
 
-        btnFoilDrive.onclick = () => {
-          btnFoilDrive.className = "px-4 py-1.5 text-xs font-bold rounded-md transition-all bg-[#ef0e0a] text-white";
-          btnManta.className = "px-4 py-1.5 text-xs font-bold rounded-md transition-all text-[#888] hover:text-white";
-          panelFoilDrive.classList.remove("hidden");
-          panelManta.classList.add("hidden");
-        };
-      }
+      const selectSize = (index: number) => {
+        const spec = STOW_SIZES[index];
+        if (!spec) return;
+
+        sizeButtons.forEach((btn, idx) => {
+          if (idx === index) {
+            btn.className = activeBtnClass;
+            btn.setAttribute("aria-pressed", "true");
+          } else {
+            btn.className = inactiveBtnClass;
+            btn.setAttribute("aria-pressed", "false");
+          }
+        });
+
+        if (specSpans.length >= 7) {
+          specSpans[0].textContent = spec.surface;
+          specSpans[1].textContent = spec.aspectRatio;
+          specSpans[2].textContent = spec.barLength;
+          specSpans[3].textContent = spec.weight;
+          specSpans[4].textContent = spec.lineMaterials;
+          specSpans[5].textContent = spec.canopyMaterials;
+          specSpans[6].textContent = spec.windRange;
+        }
+
+        if (wingImage) {
+          wingImage.style.width = spec.width;
+          wingImage.alt = spec.alt;
+        }
+      };
+
+      sizeButtons.forEach((btn, idx) => {
+        btn.onclick = () => selectSize(idx);
+      });
     }
   }, []);
 
