@@ -23,6 +23,7 @@ export const equipment = pgTable("equipment", {
   price: text("price").notNull(),
   stockStatus: text("stock_status").notNull(),
   image: text("image").notNull(),
+  images: text("images"),
   description: text("description"),
   featuredOnHome: boolean("featured_on_home").default(false).notNull(),
   published: boolean("published").default(true).notNull(),

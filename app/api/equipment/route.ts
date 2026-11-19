@@ -44,7 +44,27 @@ export async function GET(req: Request) {
       }
     }
 
-    return NextResponse.json({ success: true, data: records });
+    const formatted = records.map((r) => {
+      let imgList: string[] = [];
+      if (r.images) {
+        try {
+          const parsed = JSON.parse(r.images);
+          if (Array.isArray(parsed) && parsed.length > 0) imgList = parsed;
+        } catch {}
+        if (imgList.length === 0 && r.images.includes(",")) {
+          imgList = r.images.split(",").map((s) => s.trim()).filter(Boolean);
+        }
+      }
+      if (imgList.length === 0 && r.image) {
+        imgList = [r.image];
+      }
+      return {
+        ...r,
+        images: imgList,
+      };
+    });
+
+    return NextResponse.json({ success: true, data: formatted });
   } catch (error) {
     return NextResponse.json(
       { success: false, error: (error as Error).message },
@@ -85,6 +105,7 @@ export async function POST(req: Request) {
           price: existing.price,
           stockStatus: existing.stockStatus,
           image: existing.image,
+          images: existing.images,
           description: existing.description,
           featuredOnHome: false,
           published: false,
@@ -106,6 +127,19 @@ export async function POST(req: Request) {
       body.sku ||
       `WA-${body.brand?.startsWith("AFS") ? "AFS" : "MNT"}-${Math.floor(100 + Math.random() * 900)}`;
 
+    let primaryImage = body.image;
+    let imagesString: string | null = null;
+
+    if (Array.isArray(body.images) && body.images.length > 0) {
+      imagesString = JSON.stringify(body.images);
+      if (!primaryImage) {
+        primaryImage = body.images[0];
+      }
+    } else if (body.image) {
+      imagesString = JSON.stringify([body.image]);
+      primaryImage = body.image;
+    }
+
     const [inserted] = await db
       .insert(equipment)
       .values({
@@ -115,7 +149,8 @@ export async function POST(req: Request) {
         category: body.category,
         price: body.price,
         stockStatus: body.stockStatus || "In Stock (WA)",
-        image: body.image || "/equipment/default.jpg",
+        image: primaryImage || "/equipment/default.jpg",
+        images: imagesString,
         description: body.description ?? null,
         featuredOnHome: Boolean(body.featuredOnHome),
         published: body.published !== undefined ? Boolean(body.published) : true,
@@ -152,6 +187,16 @@ export async function PATCH(req: Request) {
     if (body.price !== undefined) updateData.price = body.price;
     if (body.stockStatus !== undefined) updateData.stockStatus = body.stockStatus;
     if (body.image !== undefined) updateData.image = body.image;
+    if (body.images !== undefined) {
+      if (Array.isArray(body.images)) {
+        updateData.images = JSON.stringify(body.images);
+        if (body.image === undefined && body.images.length > 0) {
+          updateData.image = body.images[0];
+        }
+      } else {
+        updateData.images = body.images;
+      }
+    }
     if (body.description !== undefined) updateData.description = body.description;
     if (body.featuredOnHome !== undefined) updateData.featuredOnHome = Boolean(body.featuredOnHome);
     if (body.published !== undefined) updateData.published = Boolean(body.published);

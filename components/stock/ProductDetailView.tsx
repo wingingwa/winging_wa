@@ -1,11 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowLeft,
   ArrowUpRight,
   Check,
+  ChevronLeft,
   ChevronRight,
   HelpCircle,
   Package,
@@ -23,6 +25,24 @@ export const ProductDetailView = ({
   product,
   relatedProducts,
 }: ProductDetailViewProps) => {
+  const displayImages =
+    Array.isArray(product.images) && product.images.length > 0
+      ? product.images
+      : [product.image || "/equipment/default.jpg"];
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
+
+  const prevImage = () => {
+    setActiveImageIndex((prev) =>
+      prev === 0 ? displayImages.length - 1 : prev - 1
+    );
+  };
+
+  const nextImage = () => {
+    setActiveImageIndex((prev) =>
+      prev === displayImages.length - 1 ? 0 : prev + 1
+    );
+  };
+
   const contactUrl = `/contact?item=${encodeURIComponent(product.name)}`;
 
   return (
@@ -64,8 +84,8 @@ export const ProductDetailView = ({
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 xl:px-16 py-10 lg:py-16 flex flex-col gap-14 lg:gap-20">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-start">
-          <div className="lg:col-span-6 flex flex-col gap-6 lg:sticky lg:top-36">
-            <div className="relative w-full h-[460px] sm:h-[540px] lg:h-[620px] rounded-3xl bg-[#ECECEC] p-8 sm:p-14 lg:p-16 flex items-center justify-center overflow-hidden shadow-2xl">
+          <div className="lg:col-span-6 flex flex-col gap-4 lg:sticky lg:top-36">
+            <div className="relative w-full h-[460px] sm:h-[540px] lg:h-[580px] rounded-3xl bg-[#ECECEC] p-8 sm:p-14 lg:p-16 flex items-center justify-center overflow-hidden shadow-2xl group">
               <div className="absolute top-5 left-5 z-10 flex flex-wrap gap-2">
                 {product.badge && (
                   <span
@@ -81,22 +101,74 @@ export const ProductDetailView = ({
                 </span>
               </div>
 
+              {displayImages.length > 1 && (
+                <div className="absolute top-5 right-5 z-10 rounded-full bg-black/70 text-white px-3 py-1 text-xs font-semibold backdrop-blur-md">
+                  {activeImageIndex + 1} / {displayImages.length}
+                </div>
+              )}
+
               <div className="relative w-full h-full flex items-center justify-center">
                 <Image
-                  src={product.image}
-                  alt={product.name}
+                  src={displayImages[activeImageIndex] || product.image}
+                  alt={`${product.name} - view ${activeImageIndex + 1}`}
                   fill
                   priority
                   unoptimized
                   sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-contain drop-shadow-md select-none transition-transform duration-500 hover:scale-105"
+                  className="object-contain drop-shadow-md select-none transition-all duration-300"
                 />
               </div>
+
+              {displayImages.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={prevImage}
+                    aria-label="Previous image"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 z-20 flex size-10 items-center justify-center rounded-full bg-black/60 hover:bg-[#ef0e0a] text-white transition-all cursor-pointer shadow-lg"
+                  >
+                    <ChevronLeft className="size-5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={nextImage}
+                    aria-label="Next image"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 z-20 flex size-10 items-center justify-center rounded-full bg-black/60 hover:bg-[#ef0e0a] text-white transition-all cursor-pointer shadow-lg"
+                  >
+                    <ChevronRight className="size-5" />
+                  </button>
+                </>
+              )}
 
               <div className="absolute bottom-5 right-5 z-10 rounded-full bg-white/80 px-3.5 py-1 text-xs font-semibold text-slate-700 backdrop-blur-md shadow-xs">
                 Perth Stock
               </div>
             </div>
+
+            {displayImages.length > 1 && (
+              <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-thin">
+                {displayImages.map((imgUrl, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setActiveImageIndex(idx)}
+                    className={`relative size-20 sm:size-24 rounded-2xl bg-[#ECECEC] p-2 overflow-hidden border-2 transition-all cursor-pointer shrink-0 ${
+                      idx === activeImageIndex
+                        ? "border-[#ef0e0a] shadow-lg shadow-red-950/20 scale-105"
+                        : "border-white/10 hover:border-white/30 opacity-70 hover:opacity-100"
+                    }`}
+                  >
+                    <Image
+                      src={imgUrl}
+                      alt={`${product.name} thumbnail ${idx + 1}`}
+                      fill
+                      unoptimized
+                      className="object-contain p-1"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="lg:col-span-6 flex flex-col gap-6">

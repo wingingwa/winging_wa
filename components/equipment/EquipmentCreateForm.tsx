@@ -23,18 +23,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { ImageUploader } from "@/components/dashboard/ImageUploader";
-
-const sampleStockImages = [
-  { label: "MINI Pump", path: "/stock/MINIPump.avif" },
-  { label: "AFS Stream Wing Full", path: "/stock/AFSStream-full.png" },
-  { label: "AFS Stream Front", path: "/stock/AFSStream-front.png" },
-  { label: "Carbon Fuselage Long", path: "/stock/FUSELAGECARBONLong.avif" },
-  { label: "AFS Carbon Foil Setup", path: "/stock/afs-carbon-foil-setup.jpg" },
-  { label: "Phantom Surf Foil", path: "/stock/PHANTOM840&940surffoil.avif" },
-  { label: "Rocket Wing ASC Board", path: "/stock/ROCKET-WING-ASC-5'10-110L.avif" },
-  { label: "Trax HRD Lite", path: "/stock/TRAX-HRD-Lite-136.avif" },
-];
+import { MultiImageUploader } from "@/components/dashboard/ImageUploader";
 
 export function EquipmentCreateForm() {
   const router = useRouter();
@@ -44,28 +33,20 @@ export function EquipmentCreateForm() {
     id: "",
     brand: equipmentBrands[0],
     category: equipmentCategories[1],
-    price: "$",
+    price: "",
     originalPrice: "",
     stockStatus: stockStatusOptions[0],
-    badge: "New Release",
-    image: sampleStockImages[0].path,
-    disciplines: "Surf Foil, Winging",
-    specs: "High Modulus French Carbon • Advanced Profile",
+    badge: "",
+    disciplines: "",
+    specs: "",
     description: "",
-    featuredOnHome: true,
+    featuredOnHome: false,
     published: true,
   });
 
-  const [detailedSpecs, setDetailedSpecs] = useState<{ label: string; value: string }[]>([
-    { label: "Front Wing Area", value: "850 cm²" },
-    { label: "Aspect Ratio", value: "8.2" },
-  ]);
-
-  const [inTheBox, setInTheBox] = useState<string[]>([
-    "1x High Modulus Front Wing",
-    "1x Protective Padded Cover",
-    "1x Stainless Torx Screw Set & Tool",
-  ]);
+  const [images, setImages] = useState<string[]>([]);
+  const [detailedSpecs, setDetailedSpecs] = useState<{ label: string; value: string }[]>([]);
+  const [inTheBox, setInTheBox] = useState<string[]>([]);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCreated, setIsCreated] = useState(false);
@@ -123,6 +104,11 @@ export function EquipmentCreateForm() {
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/(^-|-$)+/g, "");
 
+    const primaryImage = images[0] || "/equipment/default.jpg";
+    const formattedPrice = formData.price.trim().startsWith("$")
+      ? formData.price.trim()
+      : `$${formData.price.trim()}`;
+
     try {
       await fetch("/api/equipment", {
         method: "POST",
@@ -132,10 +118,11 @@ export function EquipmentCreateForm() {
           name: formData.name,
           brand: formData.brand,
           category: formData.category,
-          price: formData.price,
+          price: formattedPrice,
           stockStatus: formData.stockStatus,
-          image: formData.image,
-          specs: formData.specs,
+          image: primaryImage,
+          images: images,
+          specs: formData.specs || formData.description,
           description: formData.description,
           featuredOnHome: formData.featuredOnHome,
           published: publishStatus,
@@ -210,20 +197,22 @@ export function EquipmentCreateForm() {
             type="button"
             onClick={() => {
               setIsCreated(false);
+              setImages([]);
+              setDetailedSpecs([]);
+              setInTheBox([]);
               setFormData({
                 name: "",
                 id: "",
                 brand: equipmentBrands[0],
                 category: equipmentCategories[1],
-                price: "$",
+                price: "",
                 originalPrice: "",
                 stockStatus: stockStatusOptions[0],
-                badge: "New Release",
-                image: sampleStockImages[0].path,
-                disciplines: "Surf Foil, Winging",
-                specs: "High Modulus French Carbon • Advanced Profile",
+                badge: "",
+                disciplines: "",
+                specs: "",
                 description: "",
-                featuredOnHome: true,
+                featuredOnHome: false,
                 published: true,
               });
             }}
@@ -490,13 +479,18 @@ export function EquipmentCreateForm() {
           <CardContent className="p-6 flex flex-col gap-5">
             <h2 className="text-base font-bold text-white flex items-center gap-2 border-b border-white/10 pb-3">
               <Upload className="size-4 text-[#ef0e0a]" />
-              Equipment Product Image
+              Equipment Product Images
             </h2>
 
-            <ImageUploader
-              label="Product Photo (Drag & Drop or Select from Computer)"
-              value={formData.image}
-              onChange={(url) => setFormData({ ...formData, image: url })}
+            <MultiImageUploader
+              label="Product Photos (Select Multiple or Drag & Drop)"
+              values={images}
+              onChange={(newImages) => {
+                setImages(newImages);
+                if (newImages.length > 0) {
+                  setFormData((prev) => ({ ...prev, image: newImages[0] }));
+                }
+              }}
             />
           </CardContent>
         </Card>
@@ -525,11 +519,10 @@ export function EquipmentCreateForm() {
 
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-bold uppercase tracking-wider text-slate-300">
-                Specs Summary <span className="text-[#ef0e0a]">*</span>
+                Specs Summary
               </label>
               <input
                 type="text"
-                required
                 placeholder="e.g. Dual Action • Integrated Barometer Gauge • Laurent Borgna Shape"
                 value={formData.specs}
                 onChange={(e) =>

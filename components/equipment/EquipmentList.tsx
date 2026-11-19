@@ -32,7 +32,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import { ImageUploader } from "@/components/dashboard/ImageUploader";
+import { ImageUploader, MultiImageUploader } from "@/components/dashboard/ImageUploader";
 
 export function EquipmentList() {
   const [equipment, setEquipment] = useState<DashboardEquipmentItem[]>([]);
@@ -236,6 +236,7 @@ export function EquipmentList() {
           price: payload.price,
           stockStatus: payload.stockStatus,
           image: payload.image,
+          images: payload.images,
           specs: payload.specs,
           description: payload.description,
           featuredOnHome: payload.featuredOnHome,
@@ -1131,10 +1132,16 @@ export function EquipmentList() {
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <ImageUploader
-                  label="Product Photo (Drag & Drop or Choose from Computer)"
-                  value={itemToEdit.image}
-                  onChange={(url) => setItemToEdit({ ...itemToEdit, image: url })}
+                <MultiImageUploader
+                  label="Product Photos (Select Multiple or Drag & Drop)"
+                  values={itemToEdit.images || (itemToEdit.image ? [itemToEdit.image] : [])}
+                  onChange={(urls) =>
+                    setItemToEdit({
+                      ...itemToEdit,
+                      images: urls,
+                      image: urls[0] || "",
+                    })
+                  }
                 />
               </div>
 

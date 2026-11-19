@@ -9,6 +9,7 @@ export interface StockItem {
   badgeColor?: string;
   stockStatus: "In Stock (WA)" | "Low Stock" | "Demo Unit Available";
   image: string;
+  images?: string[];
   disciplines: string[];
   specs: string;
   description: string;

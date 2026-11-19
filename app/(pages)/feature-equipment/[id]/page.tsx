@@ -28,6 +28,20 @@ async function getProduct(id: string): Promise<StockItem | null> {
       const isManta = (dbItem.brand || "").toLowerCase().includes("manta");
       const brand = isAfs ? "AFS Foils" : isManta ? "Manta Foils" : (dbItem.brand || "AFS Foils");
 
+      let itemImages: string[] = [];
+      if (dbItem.images) {
+        try {
+          const parsed = JSON.parse(dbItem.images);
+          if (Array.isArray(parsed) && parsed.length > 0) itemImages = parsed;
+        } catch {}
+        if (itemImages.length === 0 && dbItem.images.includes(",")) {
+          itemImages = dbItem.images.split(",").map((s) => s.trim()).filter(Boolean);
+        }
+      }
+      if (itemImages.length === 0 && dbItem.image) {
+        itemImages = [dbItem.image];
+      }
+
       return {
         id: dbItem.id,
         name: dbItem.name,
@@ -35,7 +49,8 @@ async function getProduct(id: string): Promise<StockItem | null> {
         category: (dbItem.category || "Foil Sets") as any,
         price: dbItem.price?.startsWith("$") ? dbItem.price : `$${dbItem.price || "0.00"}`,
         stockStatus: (dbItem.stockStatus || "In Stock (WA)") as any,
-        image: dbItem.image || "/equipment/default.jpg",
+        image: itemImages[0] || dbItem.image || "/equipment/default.jpg",
+        images: itemImages,
         disciplines: ["Foil", "Winging"],
         specs: dbItem.description || "Direct Warehouse Stock",
         description: dbItem.description || "Authentic high performance equipment available in Western Australia.",
