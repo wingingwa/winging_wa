@@ -92,6 +92,7 @@ export function FeaturedEquipmentSpotlight({
 											src={item.image}
 											alt={item.name}
 											fill
+											unoptimized
 											sizes="44px"
 											className="object-contain p-1"
 										/>

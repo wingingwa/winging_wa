@@ -155,6 +155,41 @@ export default function ProductContentView() {
         btn.onclick = () => selectSize(idx);
       });
     }
+
+    const allButtons = root.querySelectorAll<HTMLButtonElement>("button");
+    let watchVideoBtn: HTMLButtonElement | null = null;
+    allButtons.forEach((btn) => {
+      if (btn.textContent && btn.textContent.includes("Watch Video")) {
+        watchVideoBtn = btn;
+      }
+    });
+
+    if (watchVideoBtn) {
+      const btn = watchVideoBtn as HTMLButtonElement;
+      const container = btn.parentElement;
+      if (container) {
+        const playVideo = () => {
+          container.innerHTML = `
+            <div class="relative w-full h-[clamp(360px,46vw,760px)] bg-black">
+              <iframe
+                class="w-full h-full border-0"
+                src="https://www.youtube.com/embed/zSYfiyy-dqI?autoplay=1&si=4IIa2qZ7gfZ7H_WY"
+                title="YouTube video player"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin"
+                allowfullscreen
+              ></iframe>
+            </div>
+          `;
+        };
+        btn.onclick = playVideo;
+        const photoSection = container.querySelector("section");
+        if (photoSection) {
+          photoSection.classList.add("cursor-pointer");
+          photoSection.onclick = playVideo;
+        }
+      }
+    }
   }, []);
 
   return (

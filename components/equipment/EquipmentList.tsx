@@ -528,6 +528,7 @@ export function EquipmentList() {
                             alt={item.name}
                             width={44}
                             height={44}
+                            unoptimized
                             className="size-full object-contain"
                           />
                         </div>
@@ -712,6 +713,7 @@ export function EquipmentList() {
                     alt={item.name}
                     width={180}
                     height={180}
+                    unoptimized
                     className="size-full object-contain group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>
@@ -869,6 +871,7 @@ export function EquipmentList() {
                     alt={itemToView.name}
                     width={56}
                     height={56}
+                    unoptimized
                     className="size-full object-contain"
                   />
                 </div>

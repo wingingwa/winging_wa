@@ -87,6 +87,7 @@ export const ProductDetailView = ({
                   alt={product.name}
                   fill
                   priority
+                  unoptimized
                   sizes="(max-width: 1024px) 100vw, 50vw"
                   className="object-contain drop-shadow-md select-none transition-transform duration-500 hover:scale-105"
                 />
@@ -295,6 +296,7 @@ export const ProductDetailView = ({
                         src={item.image}
                         alt={item.name}
                         fill
+                        unoptimized
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                         className="object-contain transition-transform duration-500 group-hover:scale-105 select-none"
                       />
