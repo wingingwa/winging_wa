@@ -4,6 +4,7 @@ import {
 	PackageIcon,
 	PhoneIcon,
 	VideoIcon,
+	LayersIcon,
 } from "lucide-react";
 
 export type SidebarNavItem = {
@@ -35,6 +36,11 @@ export const navGroups: SidebarNavGroup[] = [
 				title: "Future equipment",
 				path: "/dashboard/equipment",
 				icon: <PackageIcon />,
+			},
+			{
+				title: "AFS Foils Cards",
+				path: "/dashboard/afs-foils",
+				icon: <LayersIcon />,
 			},
 			{
 				title: "Contacts",

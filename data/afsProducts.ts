@@ -5,6 +5,8 @@ export interface AfsProduct {
   subCategory: "Front wings" | "Masts" | "Stabilizers" | "Fuselages" | "Wings";
   badge?: string;
   badgeType?: "performance" | "accessibility" | "deal" | "feature";
+  badgeBgColor?: string | null;
+  badgeTextColor?: string | null;
   sizes?: string[];
   price: string;
   originalPrice?: string;
@@ -13,6 +15,7 @@ export interface AfsProduct {
   actionText: "DISCOVER" | "GRAB THE DEAL";
   disciplines?: string[];
   href?: string;
+  visible?: boolean;
 }
 
 export const afsCategories = [

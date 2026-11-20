@@ -44,6 +44,28 @@ export const homeYoutubeVideos = pgTable("home_youtube_videos", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+export const afsFoilCards = pgTable("afs_foil_cards", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  category: text("category").notNull(),
+  subCategory: text("sub_category").notNull(),
+  image: text("image").notNull(),
+  badge: text("badge"),
+  badgeBgColor: text("badge_bg_color"),
+  badgeTextColor: text("badge_text_color"),
+  badgeType: text("badge_type"),
+  sizes: text("sizes"),
+  price: text("price").notNull(),
+  originalPrice: text("original_price"),
+  actionText: text("action_text").notNull().default("DISCOVER"),
+  url: text("url").notNull(),
+  href: text("href"),
+  disciplines: text("disciplines"),
+  visible: boolean("visible").default(true).notNull(),
+  sortOrder: integer("sort_order").default(0).notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 export type ContactSubmission = typeof contactSubmissions.$inferSelect;
 export type NewContactSubmission = typeof contactSubmissions.$inferInsert;
 
@@ -52,4 +74,7 @@ export type NewEquipmentItem = typeof equipment.$inferInsert;
 
 export type HomeYoutubeVideoRecord = typeof homeYoutubeVideos.$inferSelect;
 export type NewHomeYoutubeVideoRecord = typeof homeYoutubeVideos.$inferInsert;
+
+export type AfsFoilCardRecord = typeof afsFoilCards.$inferSelect;
+export type NewAfsFoilCardRecord = typeof afsFoilCards.$inferInsert;
 

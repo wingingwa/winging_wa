@@ -38,8 +38,22 @@ const AfsCatalog = ({
     "featured",
   );
   const [isPriceOpen, setIsPriceOpen] = useState<boolean>(true);
+  const [productsList, setProductsList] = useState<AfsProduct[]>(afsProducts);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const searchParams = useSearchParams();
+
+  useEffect(() => {
+    fetch("/api/afs-foils")
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+          setProductsList(json.data);
+        }
+      })
+      .catch((err) => console.error(err))
+      .finally(() => setIsLoading(false));
+  }, []);
 
   useEffect(() => {
     if (selectedDiscipline) {
@@ -73,10 +87,10 @@ const AfsCatalog = ({
     searchQuery === "";
 
   const availableProducts = useMemo(() => {
-    return afsProducts.filter(
-      (p) => p.category === "Foils" || p.category === "Wings",
+    return productsList.filter(
+      (p) => (p.category === "Foils" || p.category === "Wings") && p.visible !== false,
     );
-  }, []);
+  }, [productsList]);
 
   const totalCount = availableProducts.length;
   const foilsCount = availableProducts.filter((p) => p.category === "Foils").length;
@@ -387,7 +401,35 @@ const AfsCatalog = ({
           </aside>
 
           <main className="lg:col-span-9 flex flex-col">
-            {groupedProducts.length === 0 ? (
+            {isLoading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6 pt-2">
+                {Array.from({ length: 6 }).map((_, idx) => (
+                  <div
+                    key={idx}
+                    className="flex flex-col justify-between rounded-2xl border border-white/10 bg-[#343943]/40 animate-pulse overflow-hidden"
+                  >
+                    <div className="flex flex-col">
+                      <div className="relative w-full h-52 sm:h-60 bg-white/10 flex items-center justify-center p-4">
+                        <div className="absolute top-3 right-3 h-5 w-20 rounded bg-white/20" />
+                        <div className="w-32 h-20 rounded bg-white/10" />
+                      </div>
+                      <div className="flex flex-col items-center gap-2.5 p-4 pb-2">
+                        <div className="h-5 w-3/4 rounded bg-white/15" />
+                        <div className="flex gap-1.5 pt-1">
+                          <div className="h-4 w-10 rounded bg-white/10" />
+                          <div className="h-4 w-10 rounded bg-white/10" />
+                          <div className="h-4 w-10 rounded bg-white/10" />
+                        </div>
+                        <div className="h-4 w-24 rounded bg-white/15 mt-1" />
+                      </div>
+                    </div>
+                    <div className="p-4 pt-1 mt-auto">
+                      <div className="w-full h-11 rounded-xl bg-white/10" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : groupedProducts.length === 0 ? (
               <div className="rounded-3xl border border-white/15 bg-white/[0.06] p-12 text-center flex flex-col items-center justify-center gap-3 text-white">
                 <p className="text-lg font-bold text-white">
                   No products found.
@@ -426,6 +468,9 @@ const AfsCatalog = ({
                           product.href || `/afs-foils/${product.id}`;
                         const contactHref = `/contact?item=${encodeURIComponent(product.name)}`;
 
+                        const badgeBg = product.badgeBgColor;
+                        const badgeText = product.badgeTextColor || "#ffffff";
+
                         return (
                           <div
                             key={product.id}
@@ -438,13 +483,24 @@ const AfsCatalog = ({
                               >
                                 {(product.badge || product.subCategory) && (
                                   <span
+                                    style={
+                                      badgeBg
+                                        ? {
+                                            backgroundColor: badgeBg,
+                                            color: badgeText,
+                                            borderColor: "rgba(255,255,255,0.25)",
+                                          }
+                                        : undefined
+                                    }
                                     className={cn(
                                       "absolute top-3 right-3 z-10 rounded px-2 py-0.5 text-[10px] font-bold tracking-wider uppercase border",
-                                      product.badgeType === "deal"
-                                        ? "bg-[#ef0e0a] text-white border-[#ef0e0a]/30"
-                                        : product.badgeType === "performance"
-                                          ? "bg-amber-600 text-white border-amber-400/30"
-                                          : "bg-slate-900/80 text-white border-white/10",
+                                      !badgeBg && (
+                                        product.badgeType === "deal"
+                                          ? "bg-[#ef0e0a] text-white border-[#ef0e0a]/30"
+                                          : product.badgeType === "performance"
+                                            ? "bg-amber-600 text-white border-amber-400/30"
+                                            : "bg-slate-900/80 text-white border-white/10"
+                                      ),
                                     )}
                                   >
                                     {product.badge || product.subCategory}
