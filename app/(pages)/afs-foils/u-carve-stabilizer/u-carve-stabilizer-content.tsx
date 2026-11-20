@@ -191,6 +191,7 @@ export default function ProductContentView() {
   return (
     <div
       ref={containerRef}
+      suppressHydrationWarning
       className="u-carve-stabilizer-page __variable_d35d24 __className_d35d24 __variable_0d9bde __className_0d9bde antialiased relative w-full bg-[#000] text-white overflow-hidden"
       dangerouslySetInnerHTML={{ __html: pageHtml }}
     />

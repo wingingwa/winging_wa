@@ -15,9 +15,9 @@ export default function ProductPage() {
       <Suspense fallback={<div className="h-20 bg-[#000]" />}>
         <Navbar />
       </Suspense>
-      <main className="flex-1 pt-20 md:pt-24">
+      <div className="flex-1 pt-20 md:pt-24">
         <ProductContentView />
-      </main>
+      </div>
       <Footer />
     </div>
   );
