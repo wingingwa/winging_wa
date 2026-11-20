@@ -117,44 +117,43 @@ const toggle = root.querySelector("#infinity-mast-toggle");
     if (pillBtns.length > 0 && techTitle && techTableTbody) {
       const specsData = [
         { name: "Ha Ultra 600", surface: "600 cm2", span: "980 mm", ar: "16", chord: "84 mm", thick: "10.8 mm" },
-        { name: "Ha Ultra 700", surface: "700 cm2", span: "1050 mm", ar: "15.8", chord: "88 mm", thick: "11.0 mm" },
-        { name: "Ha Ultra 800", surface: "800 cm2", span: "1120 mm", ar: "15.7", chord: "92 mm", thick: "11.2 mm" },
+        { name: "Ha Ultra 750", surface: "750 cm2", span: "1080 mm", ar: "15.8", chord: "89 mm", thick: "11.0 mm" },
         { name: "Ha Ultra 900", surface: "900 cm2", span: "1190 mm", ar: "15.7", chord: "96 mm", thick: "11.5 mm" },
-        { name: "Ha Ultra 1000", surface: "1000 cm2", span: "1250 mm", ar: "15.6", chord: "100 mm", thick: "11.8 mm" },
-        { name: "Ha Ultra 1150", surface: "1150 cm2", span: "1320 mm", ar: "15.1", chord: "106 mm", thick: "12.0 mm" },
-        { name: "Ha Ultra 1300", surface: "1300 cm2", span: "1390 mm", ar: "14.9", chord: "112 mm", thick: "12.2 mm" },
       ];
 
-      pillBtns.forEach((btn, idx) => {
-        btn.onclick = () => {
-          pillBtns.forEach((b, i) => {
-            if (i === idx) {
-              b.classList.remove("text-white");
-              b.classList.add("text-[#111111]", "bg-white");
-            } else {
-              b.classList.remove("text-[#111111]", "bg-white");
-              b.classList.add("text-white");
-            }
-          });
-          const d = specsData[idx];
-          if (d) {
-            techTitle.textContent = d.name;
-            const rows = techTableTbody.querySelectorAll("tr");
-            if (rows.length >= 5) {
-              const r0 = rows[0].querySelector("td");
-              if (r0) r0.textContent = d.surface;
-              const r1 = rows[1].querySelector("td");
-              if (r1) r1.textContent = d.span;
-              const r2 = rows[2].querySelector("td");
-              if (r2) r2.textContent = d.ar;
-              const r3 = rows[3].querySelector("td");
-              if (r3) r3.textContent = d.chord;
-              const r4 = rows[4].querySelector("td");
-              if (r4) r4.textContent = d.thick;
-            }
+      const activatePill = (idx: number) => {
+        pillBtns.forEach((b, i) => {
+          if (i === idx) {
+            b.classList.remove("text-white");
+            b.classList.add("text-[#111111]", "!bg-white");
+          } else {
+            b.classList.remove("text-[#111111]", "!bg-white");
+            b.classList.add("text-white");
           }
-        };
+        });
+        const d = specsData[idx];
+        if (d) {
+          techTitle.textContent = d.name;
+          const rows = techTableTbody.querySelectorAll("tr");
+          if (rows.length >= 5) {
+            const r0 = rows[0].querySelector("td");
+            if (r0) r0.textContent = d.surface;
+            const r1 = rows[1].querySelector("td");
+            if (r1) r1.textContent = d.span;
+            const r2 = rows[2].querySelector("td");
+            if (r2) r2.textContent = d.ar;
+            const r3 = rows[3].querySelector("td");
+            if (r3) r3.textContent = d.chord;
+            const r4 = rows[4].querySelector("td");
+            if (r4) r4.textContent = d.thick;
+          }
+        }
+      };
+
+      pillBtns.forEach((btn, idx) => {
+        btn.onclick = () => activatePill(idx);
       });
+      activatePill(0);
     }
   }, []);
 
