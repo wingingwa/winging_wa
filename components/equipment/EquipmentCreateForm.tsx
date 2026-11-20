@@ -116,7 +116,7 @@ export function EquipmentCreateForm() {
         body: JSON.stringify({
           id: resolvedId,
           name: formData.name,
-          brand: formData.brand,
+          brand: formData.brand || "AFS Foils",
           category: formData.category,
           price: formattedPrice,
           stockStatus: formData.stockStatus,
@@ -291,26 +291,7 @@ export function EquipmentCreateForm() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="flex flex-col gap-1.5">
-                <label className="text-xs font-bold uppercase tracking-wider text-slate-300">
-                  Brand <span className="text-[#ef0e0a]">*</span>
-                </label>
-                <select
-                  value={formData.brand}
-                  onChange={(e) =>
-                    setFormData({ ...formData, brand: e.target.value as any })
-                  }
-                  className="h-10 px-3.5 rounded-xl bg-black/30 border border-white/15 text-sm text-white focus:outline-hidden focus:border-[#ef0e0a] cursor-pointer"
-                >
-                  {equipmentBrands.map((b) => (
-                    <option key={b} value={b} className="bg-[#343943]">
-                      {b}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="flex flex-col gap-1.5">
                 <label className="text-xs font-bold uppercase tracking-wider text-slate-300">
                   Category <span className="text-[#ef0e0a]">*</span>
