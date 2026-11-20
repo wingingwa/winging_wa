@@ -61,3 +61,32 @@
   opacity: 1 !important;
   visibility: visible !important;
 }
+
+@media (max-width: 767px) {
+  .evo-front-wing-page .global-margin {
+    margin-bottom: 1.5rem !important;
+  }
+  .evo-front-wing-page .mb_sec {
+    padding-top: 1.5rem !important;
+    padding-bottom: 1.5rem !important;
+    margin-bottom: 1rem !important;
+  }
+  .evo-front-wing-page .mb_sec .mb_img_wrap {
+    scale: 1 !important;
+    margin-top: 0 !important;
+    margin-bottom: 1.5rem !important;
+  }
+  .evo-front-wing-page .mb_sec + section {
+    padding-top: 2rem !important;
+    padding-bottom: 1rem !important;
+    margin-bottom: 0 !important;
+  }
+  .evo-front-wing-page .mb_sec + section .pimp_sec {
+    margin-bottom: 1rem !important;
+  }
+  .evo-front-wing-page .about {
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+    min-height: auto !important;
+  }
+}
