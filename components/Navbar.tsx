@@ -283,7 +283,7 @@ const Navbar = () => {
                 render={
                   <Button
                     size="icon"
-                    className="h-10 w-10 rounded-full bg-white/10 text-white hover:bg-white/20 backdrop-blur-md cursor-pointer"
+                    className="size-11 rounded-full bg-white/10 text-white hover:bg-white/20 backdrop-blur-md cursor-pointer shrink-0"
                   >
                     <Equal className="size-5" />
                     <span className="sr-only">Menu</span>

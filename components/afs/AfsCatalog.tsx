@@ -474,7 +474,7 @@ const AfsCatalog = ({
                         return (
                           <div
                             key={product.id}
-                            className="group flex flex-col justify-between rounded-2xl border border-white/10 hover:border-white/20 transition-all duration-300 text-white relative overflow-hidden"
+                            className="group flex flex-col justify-between rounded-2xl border border-white/10 hover:border-white/25 hover:shadow-lg hover:shadow-black/30 transition-all duration-300 text-white relative overflow-hidden bg-[#3a3f4a]"
                           >
                             <div className="flex flex-col">
                               <Link
@@ -518,38 +518,38 @@ const AfsCatalog = ({
                                 </div>
                               </Link>
 
-                              <div className="flex flex-col items-center text-center p-4 pb-2">
+                              <div className="flex flex-col items-center text-center px-4 pt-4 pb-3 gap-2.5">
                                 <Link
                                   href={productHref}
-                                  className="text-base sm:text-lg font-bold uppercase tracking-tight text-white leading-snug line-clamp-2 cursor-pointer group-hover:text-[#ef0e0a] transition-colors"
+                                  className="text-base sm:text-[17px] font-black uppercase tracking-tight text-white leading-snug line-clamp-2 cursor-pointer hover:text-[#ef0e0a] transition-colors"
                                 >
                                   {product.name}
                                 </Link>
 
                                 {product.sizes && product.sizes.length > 0 && (
-                                  <div className="flex flex-wrap justify-center gap-1 pt-2">
-                                    {product.sizes.slice(0, 4).map((size) => (
+                                  <div className="flex flex-wrap justify-center gap-1">
+                                    {product.sizes.slice(0, 5).map((size) => (
                                       <span
                                         key={size}
-                                        className="rounded border border-white/15 bg-white/10 px-1.5 py-0.5 text-[10px] font-semibold text-slate-200"
+                                        className="rounded-sm border border-white/20 bg-white/[0.08] px-2 py-0.5 text-[11px] font-semibold text-slate-300"
                                       >
                                         {size}
                                       </span>
                                     ))}
-                                    {product.sizes.length > 4 && (
-                                      <span className="rounded border border-white/10 bg-white/5 px-1.5 py-0.5 text-[10px] font-semibold text-slate-300">
-                                        +{product.sizes.length - 4}
+                                    {product.sizes.length > 5 && (
+                                      <span className="rounded-sm border border-white/10 bg-white/5 px-2 py-0.5 text-[11px] font-semibold text-slate-400">
+                                        +{product.sizes.length - 5}
                                       </span>
                                     )}
                                   </div>
                                 )}
 
-                                <div className="flex items-baseline justify-center gap-2 pt-2">
-                                  <span className="text-sm sm:text-base font-bold text-slate-200">
+                                <div className="flex items-baseline justify-center gap-2">
+                                  <span className="text-base sm:text-lg font-bold text-[#ef0e0a]">
                                     {product.price}
                                   </span>
                                   {product.originalPrice && (
-                                    <span className="text-xs font-normal text-orange-300 line-through">
+                                    <span className="text-xs font-normal text-slate-400 line-through">
                                       {product.originalPrice}
                                     </span>
                                   )}
@@ -557,14 +557,14 @@ const AfsCatalog = ({
                               </div>
                             </div>
 
-                            <div className="p-4 pt-1 mt-auto">
+                            <div className="px-4 pb-4 pt-1 mt-auto">
                               <Link
                                 href={productHref}
                                 className={cn(
-                                  "w-full h-11 rounded-xl text-xs sm:text-sm font-semibold tracking-wide uppercase flex items-center justify-center transition-all cursor-pointer",
+                                  "w-full h-11 rounded-xl text-xs sm:text-sm font-bold tracking-widest uppercase flex items-center justify-center transition-all duration-200 cursor-pointer",
                                   product.actionText === "GRAB THE DEAL"
                                     ? "bg-[#ef0e0a] hover:bg-[#c40c08] text-white"
-                                    : "bg-black/50 hover:bg-[#ef0e0a] text-white border border-white/15 hover:border-transparent",
+                                    : "bg-[#1a1f27] hover:bg-[#ef0e0a] text-white border border-white/10 hover:border-transparent",
                                 )}
                               >
                                 {product.actionText}

@@ -10,6 +10,8 @@ const HomeSlider = () => {
             loop
             muted
             playsInline
+            preload="none"
+            poster="/manta-banner-poster.jpg"
             className="w-full h-full object-cover"
           >
             <source

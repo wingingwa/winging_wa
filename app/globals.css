@@ -156,12 +156,16 @@
     @apply border-border outline-ring/50;
   }
 
-  body {
-    @apply bg-background text-foreground;
-  }
-
   html {
     @apply font-sans;
+    -webkit-text-size-adjust: 100%;
+    overflow-x: clip;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    overflow-x: clip;
+    -webkit-overflow-scrolling: touch;
   }
 }
 

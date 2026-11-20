@@ -10,9 +10,9 @@ export default function SmoothScroll({
   children: React.ReactNode;
 }) {
   useEffect(() => {
-    if (typeof window !== "undefined" && window.location.pathname.startsWith("/dashboard")) {
-      return;
-    }
+    if (typeof window === "undefined") return;
+    if (window.location.pathname.startsWith("/dashboard")) return;
+    if (window.innerWidth < 1024 || "ontouchstart" in window || navigator.maxTouchPoints > 0) return;
 
     const lenis = new Lenis({
       autoRaf: true,

@@ -47,7 +47,6 @@ function StockCard({ item }: { item: StockItem }) {
             src={images[currentIdx] || item.image}
             alt={item.name}
             fill
-            unoptimized
             sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
             className="object-contain transition-transform duration-500 group-hover:scale-105 select-none"
           />
