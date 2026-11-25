@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { DM_Sans } from "next/font/google";
+import Script from "next/script";
 import SmoothScroll from "@/components/SmoothScroll";
 import "./globals.css";
 
@@ -33,6 +34,17 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${dmSans.variable} font-sans h-full antialiased`}
     >
       <body className={`${dmSans.className} min-h-full flex flex-col`}>
+        <Script
+          src="https://www.googletagmanager.com/gtm.js?id=GTM-TBLZ8FHM"
+          strategy="afterInteractive"
+        />
+        <Script id="google-tag-manager-init" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+          `}
+        </Script>
         <SmoothScroll>{children}</SmoothScroll>
       </body>
     </html>
