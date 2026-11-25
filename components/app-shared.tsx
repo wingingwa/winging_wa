@@ -5,6 +5,7 @@ import {
 	PhoneIcon,
 	VideoIcon,
 	LayersIcon,
+	BarChart3Icon,
 } from "lucide-react";
 
 export type SidebarNavItem = {
@@ -26,6 +27,11 @@ export const navGroups: SidebarNavGroup[] = [
 				title: "Overview",
 				path: "/dashboard",
 				icon: <LayoutGridIcon />,
+			},
+			{
+				title: "Analytics",
+				path: "/dashboard/analytics",
+				icon: <BarChart3Icon />,
 			},
 		],
 	},
