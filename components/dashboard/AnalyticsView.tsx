@@ -37,13 +37,15 @@ interface AnalyticsData {
   countries: { country: string; visitors: number }[];
 }
 
+type RangeType = "7d" | "30d" | "90d" | "1y" | "all";
+
 export function AnalyticsView() {
-  const [range, setRange] = useState<"7d" | "30d">("7d");
+  const [range, setRange] = useState<RangeType>("30d");
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  const fetchData = useCallback(async (selectedRange: "7d" | "30d", showRefreshing = false) => {
+  const fetchData = useCallback(async (selectedRange: RangeType, showRefreshing = false) => {
     if (showRefreshing) setIsRefreshing(true);
     try {
       const res = await fetch(`/api/analytics?range=${selectedRange}`);
@@ -74,44 +76,52 @@ export function AnalyticsView() {
     return <Laptop className="size-4 text-blue-500" />;
   };
 
+  const getRangeLabel = (r: RangeType) => {
+    switch (r) {
+      case "7d":
+        return "the last 7 days";
+      case "30d":
+        return "the last 30 days";
+      case "90d":
+        return "the last 90 days";
+      case "1y":
+        return "the last 1 year";
+      case "all":
+        return "all time";
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold tracking-tight">Website Analytics</h1>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold text-emerald-600 border border-emerald-500/20">
-              <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Live Connected
-            </span>
-          </div>
+          <h1 className="text-2xl font-bold tracking-tight">Website Analytics</h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            Real-time traffic and visitor metrics powered by Google Analytics (GA4)
+            Overview of website visitors, traffic trends, and popular pages.
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <div className="inline-flex rounded-lg border bg-muted p-1 text-muted-foreground">
-            <button
-              onClick={() => setRange("7d")}
-              className={`rounded-md px-3 py-1 text-xs font-medium transition-all ${
-                range === "7d"
-                  ? "bg-background text-foreground shadow-xs"
-                  : "hover:text-foreground"
-              }`}
-            >
-              Last 7 Days
-            </button>
-            <button
-              onClick={() => setRange("30d")}
-              className={`rounded-md px-3 py-1 text-xs font-medium transition-all ${
-                range === "30d"
-                  ? "bg-background text-foreground shadow-xs"
-                  : "hover:text-foreground"
-              }`}
-            >
-              Last 30 Days
-            </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="inline-flex rounded-lg border bg-muted p-1 text-muted-foreground overflow-x-auto max-w-full">
+            {[
+              { id: "7d" as const, label: "7 Days" },
+              { id: "30d" as const, label: "30 Days" },
+              { id: "90d" as const, label: "90 Days" },
+              { id: "1y" as const, label: "1 Year" },
+              { id: "all" as const, label: "All Time" },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setRange(tab.id)}
+                className={`rounded-md px-3 py-1 text-xs font-medium transition-all whitespace-nowrap cursor-pointer ${
+                  range === tab.id
+                    ? "bg-background text-foreground shadow-xs font-semibold"
+                    : "hover:text-foreground"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
           </div>
 
           <Button
@@ -166,7 +176,7 @@ export function AnalyticsView() {
             </div>
             <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
               <TrendingUp className="size-3 text-blue-500" />
-              Unique users in {range === "7d" ? "the last 7 days" : "the last 30 days"}
+              Unique visitors in {getRangeLabel(range)}
             </p>
           </CardContent>
         </Card>
@@ -219,7 +229,7 @@ export function AnalyticsView() {
                   Visitor & Page View Trends
                 </CardTitle>
                 <CardDescription className="text-xs">
-                  Daily traffic activity recorded by Google Analytics
+                  Daily visitor activity and page views over time
                 </CardDescription>
               </div>
               <div className="flex items-center gap-4 text-xs">
@@ -265,7 +275,13 @@ export function AnalyticsView() {
                       fontSize={11}
                       tickFormatter={(val: string) => {
                         const parts = val.split("-");
-                        return parts.length >= 3 ? `${parts[1]}/${parts[2]}` : val;
+                        if (parts.length >= 3) {
+                          if (range === "1y" || range === "all") {
+                            return `${parts[1]}/${parts[0].slice(2)}`;
+                          }
+                          return `${parts[1]}/${parts[2]}`;
+                        }
+                        return val;
                       }}
                     />
                     <YAxis
@@ -317,9 +333,9 @@ export function AnalyticsView() {
                 <div className="size-10 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600 mb-2">
                   <Radio className="size-5 animate-pulse" />
                 </div>
-                <p className="text-sm font-semibold">GA4 Connected & Gathering Daily Data</p>
+                <p className="text-sm font-semibold">Visitor Activity Collecting</p>
                 <p className="text-xs text-muted-foreground mt-1 max-w-sm">
-                  Google Analytics is actively listening for visits. Daily aggregated charts will appear as users navigate throughout the day.
+                  Daily traffic trends will automatically graph here as visitors browse the site.
                 </p>
               </div>
             )}

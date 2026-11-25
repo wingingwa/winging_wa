@@ -4,8 +4,12 @@ import { BetaAnalyticsDataClient } from "@google-analytics/data";
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const range = searchParams.get("range") === "30d" ? "30d" : "7d";
-    const startDate = range === "30d" ? "30daysAgo" : "7daysAgo";
+    const range = searchParams.get("range") || "7d";
+    let startDate = "7daysAgo";
+    if (range === "30d") startDate = "30daysAgo";
+    else if (range === "90d") startDate = "90daysAgo";
+    else if (range === "1y") startDate = "365daysAgo";
+    else if (range === "all") startDate = "2020-01-01";
 
     const propertyId = process.env.GA_PROPERTY_ID;
     const clientEmail = process.env.GA_CLIENT_EMAIL;
